@@ -12,14 +12,25 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class RateLimitService {
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> authBuckets = new ConcurrentHashMap<>();
 
-    public Bucket getBucket(String clientIp) {
-        return buckets.computeIfAbsent(clientIp, this::createNewBucket);
+    public Bucket getRegularBucket(String clientIp) {
+        return buckets.computeIfAbsent(clientIp, this::createRegularBucket);
     }
 
-    private Bucket createNewBucket(String key) {
-        // 20 requisições a cada minuto
-        Bandwidth limit = Bandwidth.classic(20, Refill.greedy(20, Duration.ofMinutes(1)));
+    private Bucket createRegularBucket(String key) {
+        // 10 requisições a cada minuto
+        Bandwidth limit = Bandwidth.classic(10, Refill.greedy(10, Duration.ofMinutes(1)));
+        return Bucket.builder().addLimit(limit).build();
+    }
+
+    public Bucket getAuthBucket(String clientIp) {
+        return buckets.computeIfAbsent(clientIp, this::createAuthBucket);
+    }
+
+    private Bucket createAuthBucket(String key) {
+        // 5 requisições a cada 10 a cada minuto
+        Bandwidth limit = Bandwidth.classic(5, Refill.greedy(5, Duration.ofMinutes(1)));
         return Bucket.builder().addLimit(limit).build();
     }
 }

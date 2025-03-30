@@ -28,7 +28,15 @@ public class RateLimitFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         String ipAddress = getClientIP(request);
-        Bucket bucket = rateLimitService.getBucket(ipAddress);
+        String path = request.getRequestURI();
+
+        Bucket bucket;
+
+        if (isAuthenticationRequest(path)) {
+            bucket = rateLimitService.getAuthBucket(ipAddress);
+        } else {
+            bucket = rateLimitService.getRegularBucket(ipAddress);
+        }
 
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
@@ -36,6 +44,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
             response.setStatus(429);
             response.getWriter().write("Muitas requisições. Tente novamente mais tarde.");
         }
+    }
+
+    private boolean isAuthenticationRequest(String path) {
+        return path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register");
     }
 
     private String getClientIP(HttpServletRequest request) {
