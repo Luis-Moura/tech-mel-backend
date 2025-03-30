@@ -22,6 +22,7 @@ public class TechMelApplication {
         // Configurações do JWT
         System.setProperty("jwt.secret", dotenv.get("JWT_SECRET"));
         System.setProperty("jwt.expiration", dotenv.get("JWT_EXPIRATION"));
+        System.setProperty("jwt.refresh-expiration", dotenv.get("JWT_REFRESH_EXPIRATION"));
 
         // Configurações de email
         System.setProperty("spring.mail.host", dotenv.get("MAIL_HOST"));
