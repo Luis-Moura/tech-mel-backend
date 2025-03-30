@@ -1,6 +1,5 @@
 package com.tech_mel.tech_mel.infrastructure.persistence.repository;
 
-import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.RefreshTokenEntity;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
