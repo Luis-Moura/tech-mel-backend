@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class RateLimitService {
-    private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final Map<String, Bucket> regularBuckets = new ConcurrentHashMap<>();
     private final Map<String, Bucket> authBuckets = new ConcurrentHashMap<>();
 
     public Bucket getRegularBucket(String clientIp) {
-        return buckets.computeIfAbsent(clientIp, this::createRegularBucket);
+        return regularBuckets.computeIfAbsent(clientIp, this::createRegularBucket);
     }
 
     private Bucket createRegularBucket(String key) {
@@ -25,7 +25,7 @@ public class RateLimitService {
     }
 
     public Bucket getAuthBucket(String clientIp) {
-        return buckets.computeIfAbsent(clientIp, this::createAuthBucket);
+        return authBuckets.computeIfAbsent(clientIp, this::createAuthBucket);
     }
 
     private Bucket createAuthBucket(String key) {
