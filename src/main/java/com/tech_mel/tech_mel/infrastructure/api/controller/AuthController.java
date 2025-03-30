@@ -44,7 +44,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegistrationRequest request) {
-        User user = authUseCase.registerUser(request.getEmail(), request.getPassword(), request.getName());
+        authUseCase.registerUser(request.getEmail(), request.getPassword(), request.getName());
         return ResponseEntity.ok().body(Map.of("message", "Usuário registrado com sucesso. Verifique seu e-mail para ativar a conta."));
     }
 

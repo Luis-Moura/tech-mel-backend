@@ -99,9 +99,17 @@ public class JwtFactory {
                 .getBody();
     }
 
-    public boolean validateToken(String token) {
+    public boolean isValidAccessToken(String token) {
+        return isValidToken(token) && !isRefreshToken(token);
+    }
+
+    public boolean isValidRefreshToken(String token) {
+        return isValidToken(token) && isRefreshToken(token);
+    }
+
+    private boolean isValidToken(String token) {
         try {
-            return !isTokenExpired(token);
+            return !isExpired(token);
         } catch (Exception e) {
             return false;
         }
@@ -111,7 +119,7 @@ public class JwtFactory {
         return "REFRESH".equals(extractTokenType(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    private boolean isExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 }

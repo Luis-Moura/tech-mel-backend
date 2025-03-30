@@ -5,7 +5,7 @@ import com.tech_mel.tech_mel.domain.model.User;
 public interface AuthUseCase {
     String authenticateUser(String email, String password);
 
-    User registerUser(String email, String password, String name);
+    void registerUser(String email, String password, String name);
 
     boolean verifyEmail(String token);
 

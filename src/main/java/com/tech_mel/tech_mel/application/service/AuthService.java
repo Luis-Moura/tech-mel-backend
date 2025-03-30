@@ -50,7 +50,7 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    public User registerUser(String email, String password, String name) {
+    public void registerUser(String email, String password, String name) {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new InvalidCredentialsException("E-mail já cadastrado");
         }
@@ -71,7 +71,6 @@ public class AuthService implements AuthUseCase {
 
         eventPublisher.publishEvent(new UserRegisteredEvent(user, verificationToken));
 
-        return user;
     }
 
     @Override
@@ -110,7 +109,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public String refreshToken(String refreshToken) {
-        if (!jwtFactory.validateToken(refreshToken) || !jwtFactory.isRefreshToken(refreshToken)) {
+        if (!jwtFactory.isValidRefreshToken(refreshToken)) {
             throw new InvalidTokenException("Refresh token inválido ou expirado");
         }
 
