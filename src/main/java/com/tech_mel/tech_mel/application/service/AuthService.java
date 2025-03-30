@@ -51,8 +51,22 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public void registerUser(String email, String password, String name) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new InvalidCredentialsException("E-mail já cadastrado");
+        User existingUser = userRepository.findByEmail(email)
+                .orElse(null);
+
+        if (existingUser != null) {
+            if (existingUser.isEmailVerified()) {
+                throw new InvalidCredentialsException("E-mail já cadastrado");
+            } else {
+                existingUser.setPassword(passwordEncoder.encode(password));
+                existingUser.setName(name);
+                existingUser.setEnabled(true);
+                existingUser.setLocked(false);
+
+                String verificationToken = generateVerificationToken(existingUser);
+                eventPublisher.publishEvent(new UserRegisteredEvent(existingUser, verificationToken));
+                return;
+            }
         }
 
         User user = User.builder()
