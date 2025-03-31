@@ -1,8 +1,8 @@
-// src/main/java/com/tech_mel/tech_mel/infrastructure/security/JwtAuthenticationFilter.java
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
+import com.tech_mel.tech_mel.application.service.JwtValidationService;
+import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
 import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
-import com.tech_mel.tech_mel.infrastructure.security.jwt.JwtFactory;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtFactory jwtFactory;
+    private final JwtValidationService jwtValidationService;
+    private final JwtOperationsPort jwtOperationsPort;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
@@ -43,12 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         try {
-            if (!jwtFactory.isValidAccessToken(jwt)) {
+            if (!jwtValidationService.validateToken(jwt, "ACCESS")) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            userEmail = jwtFactory.extractUsername(jwt);
+            userEmail = jwtOperationsPort.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
@@ -63,7 +64,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         } catch (Exception e) {
-            // Token inválido ou expirado - apenas continua a cadeia
+            logger.debug("Falha na validação do token JWT: " + e.getMessage());
+            if (logger.isTraceEnabled()) {
+                logger.trace("Detalhes do erro:", e);
+            }
+
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token inválido ou expirado");
+            return;
         }
 
         filterChain.doFilter(request, response);

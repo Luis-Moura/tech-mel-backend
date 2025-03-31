@@ -2,29 +2,35 @@ package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
 import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
-import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
-import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
-import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
-import com.tech_mel.tech_mel.infrastructure.security.jwt.JwtFactory;
+import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
+import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService implements AuthUseCase {
 
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
+
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final JwtFactory jwtFactory;
+    private final JwtOperationsPort jwtOperationsPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Override
@@ -48,7 +54,11 @@ public class AuthService implements AuthUseCase {
         user.setLastLogin(LocalDateTime.now());
         userRepositoryPort.save(user);
 
-        return jwtFactory.generateAccessToken(user);
+        // Gera o token JWT chamando a porta
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "ACCESS");
+
+        return jwtOperationsPort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
     }
 
     @Override
@@ -127,6 +137,9 @@ public class AuthService implements AuthUseCase {
     public String refreshToken(String refreshToken) {
         RefreshToken token = refreshTokenUseCase.verifyRefreshToken(refreshToken);
 
-        return jwtFactory.generateAccessToken(token.getUser());
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "ACCESS");
+
+        return jwtOperationsPort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
     }
 }
