@@ -8,7 +8,7 @@ import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
-import com.tech_mel.tech_mel.domain.port.output.JwtServicePort;
+import com.tech_mel.tech_mel.domain.port.output.JwtPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class AuthService implements AuthUseCase {
     private final RefreshTokenUseCase refreshTokenUseCase;
 //    private final JwtBlackListPort jwtBlackListPort;
 
-    private final JwtServicePort jwtServicePort;
+    private final JwtPort jwtServicePort;
 
     @Override
     public String authenticateUser(String email, String password) {

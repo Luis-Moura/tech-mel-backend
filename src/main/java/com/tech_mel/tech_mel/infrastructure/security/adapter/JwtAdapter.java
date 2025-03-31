@@ -1,6 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.security.adapter;
 
-import com.tech_mel.tech_mel.domain.port.output.JwtServicePort;
+import com.tech_mel.tech_mel.domain.port.output.JwtPort;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,14 +17,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
-public class JwtServiceAdapter implements JwtServicePort {
+public class JwtAdapter implements JwtPort {
 
     @Value("${jwt.secret}")
     private String secretKey;
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    public JwtServiceAdapter(RedisTemplate<String, String> redisTemplate) {
+    public JwtAdapter(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
