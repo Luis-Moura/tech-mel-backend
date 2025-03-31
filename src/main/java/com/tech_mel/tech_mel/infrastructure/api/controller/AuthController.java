@@ -8,7 +8,6 @@ import com.tech_mel.tech_mel.infrastructure.api.dto.AuthRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.AuthResponse;
 import com.tech_mel.tech_mel.infrastructure.api.dto.RefreshTokenRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.RegistrationRequest;
-import com.tech_mel.tech_mel.infrastructure.security.jwt.JwtFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthUseCase authUseCase;
-    private final JwtFactory jwtFactory;
     private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Value("${jwt.expiration}")

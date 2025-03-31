@@ -1,7 +1,6 @@
 package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
-import com.tech_mel.tech_mel.application.exception.InvalidTokenException;
 import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
 import com.tech_mel.tech_mel.application.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.application.port.input.RefreshTokenUseCase;
