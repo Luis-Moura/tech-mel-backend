@@ -1,5 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
+import com.tech_mel.tech_mel.application.exception.RateLimitExceededException;
 import com.tech_mel.tech_mel.application.service.RateLimitService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -41,8 +42,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
         } else {
-            response.setStatus(429);
-            response.getWriter().write("Muitas requisições. Tente novamente mais tarde.");
+            long waitTime = 60;
+            throw new RateLimitExceededException(waitTime);
         }
     }
 

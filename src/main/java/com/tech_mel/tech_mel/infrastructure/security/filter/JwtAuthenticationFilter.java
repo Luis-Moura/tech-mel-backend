@@ -1,5 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
+import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
 import com.tech_mel.tech_mel.application.service.JwtValidationService;
 import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
 import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
@@ -45,34 +46,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             if (!jwtValidationService.validateToken(jwt, "ACCESS")) {
-                filterChain.doFilter(request, response);
-                return;
+                throw new TokenExpiredException("Token inválido ou expirado");
             }
 
             userEmail = jwtOperationsPort.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities()
                 );
+
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (Exception e) {
-            logger.debug("Falha na validação do token JWT: " + e.getMessage());
-            if (logger.isTraceEnabled()) {
-                logger.trace("Detalhes do erro:", e);
-            }
-
+        } catch (TokenExpiredException e) {
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token inválido ou expirado");
-            return;
+
+            request.setAttribute("exception", e);
+
+            throw e;
+        } catch (Exception e) {
+            SecurityContextHolder.clearContext();
+
+            request.setAttribute("exception", e);
+
+            throw new TokenExpiredException(e.getMessage());
         }
 
         filterChain.doFilter(request, response);

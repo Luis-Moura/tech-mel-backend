@@ -1,6 +1,7 @@
 package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
+import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
 import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
@@ -98,16 +99,15 @@ public class AuthService implements AuthUseCase {
         String verificationToken = generateVerificationToken(user);
 
         eventPublisher.publishEvent(new UserRegisteredEvent(user, verificationToken));
-
     }
 
     @Override
     public boolean verifyEmail(String token) {
         User user = userRepositoryPort.findByVerificationToken(token)
-                .orElseThrow(() -> new InvalidCredentialsException("Token de verificação inválido"));
+                .orElseThrow(() -> new TokenExpiredException("Token de verificação inválido"));
 
         if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new InvalidCredentialsException("Token de verificação expirado");
+            throw new TokenExpiredException("Token de verificação expirado");
         }
 
         user.setEmailVerified(true);
@@ -148,7 +148,7 @@ public class AuthService implements AuthUseCase {
     @Override
     public void logout(String token) {
         if (!jwtOperationsPort.isTokenValid(token, "ACCESS") || jwtBlackListPort.isBlacklisted(token)) {
-            throw new InvalidCredentialsException("Token inválido");
+            throw new TokenExpiredException("Token inválido");
         }
 
         String userEmail = jwtOperationsPort.extractUsername(token);

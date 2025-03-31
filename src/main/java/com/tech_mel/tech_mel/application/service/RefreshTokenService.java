@@ -1,5 +1,8 @@
 package com.tech_mel.tech_mel.application.service;
 
+import com.tech_mel.tech_mel.application.exception.RefreshTokenNotFoundException;
+import com.tech_mel.tech_mel.application.exception.ResourceNotFoundException;
+import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.domain.port.output.RefreshTokenRepositoryPort;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
@@ -38,10 +41,10 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     @Transactional()
     public RefreshToken verifyRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
 
         if (refreshToken.isExpired()) {
-            throw new IllegalArgumentException("Token de refresh expirado ou revogado");
+            throw new TokenExpiredException("Token de refresh expirado ou revogado");
         }
 
         return refreshToken;
@@ -51,7 +54,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     @Transactional
     public void revokeRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Token de refresh não encontrado"));
 
         refreshTokenRepositoryPort.deleteByToken(refreshToken.getToken());
     }
