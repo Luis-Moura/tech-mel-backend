@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.infrastructure.api.dto;
+package com.tech_mel.tech_mel.infrastructure.api.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

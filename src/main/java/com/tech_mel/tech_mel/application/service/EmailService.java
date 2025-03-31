@@ -1,6 +1,6 @@
 package com.tech_mel.tech_mel.application.service;
 
-import com.tech_mel.tech_mel.application.port.output.EmailSenderPort;
+import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.User;
 import lombok.RequiredArgsConstructor;

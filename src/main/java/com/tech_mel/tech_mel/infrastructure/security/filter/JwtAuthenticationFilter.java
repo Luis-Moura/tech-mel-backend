@@ -1,6 +1,7 @@
 // src/main/java/com/tech_mel/tech_mel/infrastructure/security/JwtAuthenticationFilter.java
-package com.tech_mel.tech_mel.infrastructure.security;
+package com.tech_mel.tech_mel.infrastructure.security.filter;
 
+import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
 import com.tech_mel.tech_mel.infrastructure.security.jwt.JwtFactory;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

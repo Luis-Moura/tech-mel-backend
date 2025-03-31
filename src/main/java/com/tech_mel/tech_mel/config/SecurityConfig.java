@@ -1,8 +1,8 @@
 package com.tech_mel.tech_mel.config;
 
-import com.tech_mel.tech_mel.infrastructure.security.JwtAuthenticationFilter;
-import com.tech_mel.tech_mel.infrastructure.security.RateLimitFilter;
-import com.tech_mel.tech_mel.infrastructure.security.UserDetailsServiceImpl;
+import com.tech_mel.tech_mel.infrastructure.security.filter.JwtAuthenticationFilter;
+import com.tech_mel.tech_mel.infrastructure.security.filter.RateLimitFilter;
+import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -2,9 +2,9 @@ package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
 import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
-import com.tech_mel.tech_mel.application.port.input.AuthUseCase;
-import com.tech_mel.tech_mel.application.port.input.RefreshTokenUseCase;
-import com.tech_mel.tech_mel.application.port.output.UserRepositoryPort;
+import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
+import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;

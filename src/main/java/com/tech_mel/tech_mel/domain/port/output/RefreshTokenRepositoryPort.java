@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.application.port.output;
+package com.tech_mel.tech_mel.domain.port.output;
 
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;

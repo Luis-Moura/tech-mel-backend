@@ -1,6 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.email;
 
-import com.tech_mel.tech_mel.application.port.output.EmailSenderPort;
+import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

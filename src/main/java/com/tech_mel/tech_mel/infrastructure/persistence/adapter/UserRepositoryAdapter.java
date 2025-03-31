@@ -1,6 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.persistence.adapter;
 
-import com.tech_mel.tech_mel.application.port.output.UserRepositoryPort;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.UserEntity;
 import com.tech_mel.tech_mel.infrastructure.persistence.mapper.UserMapper;

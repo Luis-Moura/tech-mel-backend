@@ -1,14 +1,15 @@
-package com.tech_mel.tech_mel.infrastructure.api.dto;
+package com.tech_mel.tech_mel.infrastructure.api.dto.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistrationRequest {
+public class AuthRequest {
     private String email;
     private String password;
-    private String name;
 }

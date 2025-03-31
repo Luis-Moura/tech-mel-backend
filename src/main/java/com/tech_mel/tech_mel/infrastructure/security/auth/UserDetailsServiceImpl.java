@@ -1,6 +1,6 @@
-package com.tech_mel.tech_mel.infrastructure.security;
+package com.tech_mel.tech_mel.infrastructure.security.auth;
 
-import com.tech_mel.tech_mel.application.port.output.UserRepositoryPort;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

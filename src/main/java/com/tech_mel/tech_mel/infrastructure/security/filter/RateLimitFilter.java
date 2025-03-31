@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.infrastructure.security;
+package com.tech_mel.tech_mel.infrastructure.security.filter;
 
 import com.tech_mel.tech_mel.application.service.RateLimitService;
 import jakarta.servlet.FilterChain;

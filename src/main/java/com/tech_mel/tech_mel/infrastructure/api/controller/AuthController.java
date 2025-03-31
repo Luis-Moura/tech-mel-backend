@@ -1,13 +1,13 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
-import com.tech_mel.tech_mel.application.port.input.AuthUseCase;
-import com.tech_mel.tech_mel.application.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
+import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
-import com.tech_mel.tech_mel.infrastructure.api.dto.AuthRequest;
-import com.tech_mel.tech_mel.infrastructure.api.dto.AuthResponse;
-import com.tech_mel.tech_mel.infrastructure.api.dto.RefreshTokenRequest;
-import com.tech_mel.tech_mel.infrastructure.api.dto.RegistrationRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.AuthRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.response.AuthResponse;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.RefreshTokenRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.RegistrationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
