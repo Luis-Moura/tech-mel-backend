@@ -8,8 +8,7 @@ import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
-import com.tech_mel.tech_mel.domain.port.output.JwtBlackListPort;
-import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
+import com.tech_mel.tech_mel.domain.port.output.JwtServicePort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,9 +31,11 @@ public class AuthService implements AuthUseCase {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final JwtOperationsPort jwtOperationsPort;
+    //    private final JwtOperationsPort jwtOperationsPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
-    private final JwtBlackListPort jwtBlackListPort;
+//    private final JwtBlackListPort jwtBlackListPort;
+
+    private final JwtServicePort jwtServicePort;
 
     @Override
     public String authenticateUser(String email, String password) {
@@ -61,7 +62,7 @@ public class AuthService implements AuthUseCase {
         Map<String, Object> claims = new HashMap<>();
         claims.put("tokenType", "ACCESS");
 
-        return jwtOperationsPort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
+        return jwtServicePort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
     }
 
     @Override
@@ -142,21 +143,21 @@ public class AuthService implements AuthUseCase {
         Map<String, Object> claims = new HashMap<>();
         claims.put("tokenType", "ACCESS");
 
-        return jwtOperationsPort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
+        return jwtServicePort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
     }
 
     @Override
     public void logout(String token) {
-        if (!jwtOperationsPort.isTokenValid(token, "ACCESS") || jwtBlackListPort.isBlacklisted(token)) {
-            throw new TokenExpiredException("Token inválido");
+        if (!jwtServicePort.isTokenValid(token, "ACCESS")) {
+            throw new TokenExpiredException("Token inválido ou expirado");
         }
 
-        String userEmail = jwtOperationsPort.extractUsername(token);
+        String userEmail = jwtServicePort.extractUsername(token);
 
         User user = userRepositoryPort.findByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
-        jwtBlackListPort.addToBlacklist(token);
+        jwtServicePort.addToBlacklist(token);
 
         refreshTokenUseCase.revokeAllUserTokens(user);
     }

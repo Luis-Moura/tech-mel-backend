@@ -1,8 +1,7 @@
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
 import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
-import com.tech_mel.tech_mel.application.service.JwtValidationService;
-import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
+import com.tech_mel.tech_mel.domain.port.output.JwtServicePort;
 import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,9 +21,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private final JwtServicePort jwtServicePort;
 
-    private final JwtValidationService jwtValidationService;
-    private final JwtOperationsPort jwtOperationsPort;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
@@ -45,11 +43,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
 
         try {
-            if (!jwtValidationService.validateToken(jwt, "ACCESS")) {
+            if (!jwtServicePort.isTokenValid(jwt, "ACCESS")) {
                 throw new TokenExpiredException("Token inválido ou expirado");
             }
 
-            userEmail = jwtOperationsPort.extractUsername(jwt);
+            userEmail = jwtServicePort.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
