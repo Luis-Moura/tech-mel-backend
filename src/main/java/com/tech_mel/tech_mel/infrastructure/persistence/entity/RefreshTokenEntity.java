@@ -21,21 +21,10 @@ public class RefreshTokenEntity {
     @Column(nullable = false, unique = true)
     private String token;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user;
-
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    @Column(nullable = false)
-    private boolean revoked;
-
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiryDate);
-    }
-
-    public boolean isValid() {
-        return !isExpired() && !revoked;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 }

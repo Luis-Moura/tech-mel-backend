@@ -17,17 +17,11 @@ public class RefreshToken {
 
     private String token;
 
-    private boolean revoked;
-
     private LocalDateTime expiryDate;
 
     private User user;
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiryDate);
-    }
-
-    public boolean isValid() {
-        return !isExpired() && !revoked;
     }
 }

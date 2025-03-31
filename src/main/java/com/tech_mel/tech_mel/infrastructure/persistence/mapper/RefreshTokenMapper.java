@@ -22,7 +22,6 @@ public class RefreshTokenMapper {
                 .token(entity.getToken())
                 .user(userMapper.toDomain(entity.getUser()))
                 .expiryDate(entity.getExpiryDate())
-                .revoked(entity.isRevoked())
                 .build();
     }
 
@@ -36,7 +35,6 @@ public class RefreshTokenMapper {
                 .token(domain.getToken())
                 .user(userMapper.toEntity(domain.getUser()))
                 .expiryDate(domain.getExpiryDate())
-                .revoked(domain.isRevoked())
                 .build();
     }
 }
