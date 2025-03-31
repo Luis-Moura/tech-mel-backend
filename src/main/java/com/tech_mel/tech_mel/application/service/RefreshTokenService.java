@@ -40,7 +40,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
-        if (!refreshToken.isExpired()) {
+        if (refreshToken.isExpired()) {
             throw new IllegalArgumentException("Token de refresh expirado ou revogado");
         }
 
@@ -53,7 +53,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
-        refreshTokenRepository.deleteByToken(refreshToken.toString());
+        refreshTokenRepository.deleteByToken(refreshToken.getToken());
     }
 
     @Override

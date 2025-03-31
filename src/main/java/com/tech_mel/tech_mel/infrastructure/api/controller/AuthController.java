@@ -1,6 +1,8 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
 import com.tech_mel.tech_mel.application.port.input.AuthUseCase;
+import com.tech_mel.tech_mel.application.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.infrastructure.api.dto.AuthRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.AuthResponse;
@@ -21,6 +23,7 @@ public class AuthController {
 
     private final AuthUseCase authUseCase;
     private final JwtFactory jwtFactory;
+    private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
@@ -30,11 +33,11 @@ public class AuthController {
         String accessToken = authUseCase.authenticateUser(request.getEmail(), request.getPassword());
 
         User user = authUseCase.findUserByEmail(request.getEmail());
-        String refreshToken = jwtFactory.generateRefreshToken(user);
+        RefreshToken refreshToken = refreshTokenUseCase.createRefreshToken(user);
 
         AuthResponse response = AuthResponse.builder()
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .refreshToken(refreshToken.getToken())
                 .tokenType("Bearer")
                 .expiresIn(jwtExpiration / 1000)
                 .build();
@@ -54,7 +57,7 @@ public class AuthController {
 
         AuthResponse response = AuthResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(request.getRefreshToken()) // mantém o mesmo refresh token
+                .refreshToken(request.getRefreshToken())
                 .tokenType("Bearer")
                 .expiresIn(jwtExpiration / 1000)
                 .build();

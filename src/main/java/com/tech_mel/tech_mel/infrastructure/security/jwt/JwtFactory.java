@@ -25,15 +25,8 @@ public class JwtFactory {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
-    @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration;
-
     public String generateAccessToken(User user) {
         return generateToken(createAccessTokenClaims(user), user.getEmail(), jwtExpiration);
-    }
-
-    public String generateRefreshToken(User user) {
-        return generateToken(createRefreshTokenClaims(user), user.getEmail(), refreshExpiration);
     }
 
     private Map<String, Object> createAccessTokenClaims(User user) {
@@ -42,13 +35,6 @@ public class JwtFactory {
         claims.put("role", user.getRole());
         claims.put("tokenType", "ACCESS");
 
-        return claims;
-    }
-
-    private Map<String, Object> createRefreshTokenClaims(User user) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId().toString());
-        claims.put("tokenType", "REFRESH");
         return claims;
     }
 
@@ -77,8 +63,7 @@ public class JwtFactory {
     }
 
     public UUID extractUserId(String token) {
-        String userId = extractClaim(token, claims -> claims.get("userId", String.class));
-        return UUID.fromString(userId);
+        return extractClaim(token, claims -> UUID.fromString(claims.get("userId").toString()));
     }
 
     public String extractTokenType(String token) {
@@ -100,23 +85,11 @@ public class JwtFactory {
     }
 
     public boolean isValidAccessToken(String token) {
-        return isValidToken(token) && !isRefreshToken(token);
-    }
-
-    public boolean isValidRefreshToken(String token) {
-        return isValidToken(token) && isRefreshToken(token);
-    }
-
-    private boolean isValidToken(String token) {
         try {
-            return !isExpired(token);
+            return !isExpired(token) && "ACCESS".equals(extractTokenType(token));
         } catch (Exception e) {
             return false;
         }
-    }
-
-    public boolean isRefreshToken(String token) {
-        return "REFRESH".equals(extractTokenType(token));
     }
 
     private boolean isExpired(String token) {

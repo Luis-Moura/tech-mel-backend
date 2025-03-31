@@ -4,8 +4,10 @@ import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
 import com.tech_mel.tech_mel.application.exception.InvalidTokenException;
 import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
 import com.tech_mel.tech_mel.application.port.input.AuthUseCase;
+import com.tech_mel.tech_mel.application.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.application.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
+import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.infrastructure.security.jwt.JwtFactory;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class AuthService implements AuthUseCase {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final JwtFactory jwtFactory;
+    private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Override
     public String authenticateUser(String email, String password) {
@@ -123,24 +126,8 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public String refreshToken(String refreshToken) {
-        if (!jwtFactory.isValidRefreshToken(refreshToken)) {
-            throw new InvalidTokenException("Refresh token inválido ou expirado");
-        }
+        RefreshToken token = refreshTokenUseCase.verifyRefreshToken(refreshToken);
 
-        String email = jwtFactory.extractUsername(refreshToken);
-        UUID userId = jwtFactory.extractUserId(refreshToken);
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
-
-        if (!user.getId().equals(userId)) {
-            throw new InvalidTokenException("Token inválido");
-        }
-
-        if (!user.isEnabled() || user.isLocked()) {
-            throw new InvalidCredentialsException("Conta bloqueada ou desativada");
-        }
-
-        return jwtFactory.generateAccessToken(user);
+        return jwtFactory.generateAccessToken(token.getUser());
     }
 }
