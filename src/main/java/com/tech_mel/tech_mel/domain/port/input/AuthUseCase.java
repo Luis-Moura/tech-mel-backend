@@ -14,4 +14,6 @@ public interface AuthUseCase {
     String refreshToken(String refreshToken);
 
     User findUserByEmail(String email);
+
+    void logout(String token);
 }

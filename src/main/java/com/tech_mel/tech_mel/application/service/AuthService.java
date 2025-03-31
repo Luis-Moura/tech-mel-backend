@@ -7,6 +7,7 @@ import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.port.output.JwtBlackListPort;
 import com.tech_mel.tech_mel.domain.port.output.JwtOperationsPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class AuthService implements AuthUseCase {
     private final ApplicationEventPublisher eventPublisher;
     private final JwtOperationsPort jwtOperationsPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
+    private final JwtBlackListPort jwtBlackListPort;
 
     @Override
     public String authenticateUser(String email, String password) {
@@ -141,5 +143,21 @@ public class AuthService implements AuthUseCase {
         claims.put("tokenType", "ACCESS");
 
         return jwtOperationsPort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
+    }
+
+    @Override
+    public void logout(String token) {
+        if (!jwtOperationsPort.isTokenValid(token, "ACCESS") || jwtBlackListPort.isBlacklisted(token)) {
+            throw new InvalidCredentialsException("Token inválido");
+        }
+
+        String userEmail = jwtOperationsPort.extractUsername(token);
+
+        User user = userRepositoryPort.findByEmail(userEmail)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        jwtBlackListPort.addToBlacklist(token);
+
+        refreshTokenUseCase.revokeAllUserTokens(user);
     }
 }
