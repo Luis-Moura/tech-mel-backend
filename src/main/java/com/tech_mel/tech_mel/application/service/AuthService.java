@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthService implements AuthUseCase {
 
-    private final UserRepositoryPort userRepository;
+    private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final JwtFactory jwtFactory;
@@ -29,7 +29,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public String authenticateUser(String email, String password) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o email: " + email));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -46,14 +46,14 @@ public class AuthService implements AuthUseCase {
 
         // Atualiza o último login
         user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
+        userRepositoryPort.save(user);
 
         return jwtFactory.generateAccessToken(user);
     }
 
     @Override
     public void registerUser(String email, String password, String name) {
-        User existingUser = userRepository.findByEmail(email)
+        User existingUser = userRepositoryPort.findByEmail(email)
                 .orElse(null);
 
         if (existingUser != null) {
@@ -81,7 +81,7 @@ public class AuthService implements AuthUseCase {
                 .locked(false)
                 .build();
 
-        user = userRepository.save(user);
+        user = userRepositoryPort.save(user);
 
         String verificationToken = generateVerificationToken(user);
 
@@ -91,7 +91,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public boolean verifyEmail(String token) {
-        User user = userRepository.findByVerificationToken(token)
+        User user = userRepositoryPort.findByVerificationToken(token)
                 .orElseThrow(() -> new InvalidCredentialsException("Token de verificação inválido"));
 
         if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
@@ -101,14 +101,14 @@ public class AuthService implements AuthUseCase {
         user.setEmailVerified(true);
         user.setVerificationToken(null);
         user.setTokenExpiry(null);
-        userRepository.save(user);
+        userRepositoryPort.save(user);
 
         return true;
     }
 
     @Override
     public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o email: " + email));
     }
 
@@ -118,7 +118,7 @@ public class AuthService implements AuthUseCase {
 
         user.setVerificationToken(token);
         user.setTokenExpiry(LocalDateTime.now().plusHours(24));
-        userRepository.save(user);
+        userRepositoryPort.save(user);
 
         return token;
     }

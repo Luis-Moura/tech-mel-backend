@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {
-    private final UserRepositoryPort userRepository;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Override
     public User getCurrentUser(String email) {
-        return userRepository.findByEmail(email)
+        return userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

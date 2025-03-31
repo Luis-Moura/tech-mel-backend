@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService implements RefreshTokenUseCase {
-    private final RefreshTokenRepositoryPort refreshTokenRepository;
+    private final RefreshTokenRepositoryPort refreshTokenRepositoryPort;
 
     @Value("${jwt.refresh-expiration}")
     private Long refreshTokenExpiration;
@@ -31,13 +31,13 @@ public class RefreshTokenService implements RefreshTokenUseCase {
                 .expiryDate(LocalDateTime.now().plusSeconds(refreshTokenExpiration / 1000))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        return refreshTokenRepositoryPort.save(refreshToken);
     }
 
     @Override
     @Transactional()
     public RefreshToken verifyRefreshToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
         if (refreshToken.isExpired()) {
@@ -50,15 +50,15 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     @Override
     @Transactional
     public void revokeRefreshToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
-        refreshTokenRepository.deleteByToken(refreshToken.getToken());
+        refreshTokenRepositoryPort.deleteByToken(refreshToken.getToken());
     }
 
     @Override
     @Transactional
     public void revokeAllUserTokens(User user) {
-        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepositoryPort.deleteByUser(user);
     }
 }
