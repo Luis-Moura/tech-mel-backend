@@ -1,12 +1,15 @@
 package com.tech_mel.tech_mel.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tech_mel.tech_mel.infrastructure.security.filter.JwtAuthenticationFilter;
 import com.tech_mel.tech_mel.infrastructure.security.filter.RateLimitFilter;
 import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +20,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +41,22 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.setCharacterEncoding("UTF-8");
+
+                            Map<String, Object> body = Map.of(
+                                    "timestamp", LocalDateTime.now().toString(),
+                                    "status", HttpStatus.UNAUTHORIZED.value(),
+                                    "error", "Unauthorized",
+                                    "message", "Token inválido ou expirado"
+                            );
+
+                            new ObjectMapper().writeValue(response.getOutputStream(), body);
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/auth/logout").authenticated()

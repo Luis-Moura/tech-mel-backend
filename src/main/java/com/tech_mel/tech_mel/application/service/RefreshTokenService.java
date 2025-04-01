@@ -1,12 +1,11 @@
 package com.tech_mel.tech_mel.application.service;
 
-import com.tech_mel.tech_mel.application.exception.RefreshTokenNotFoundException;
-import com.tech_mel.tech_mel.application.exception.ResourceNotFoundException;
-import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
-import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
-import com.tech_mel.tech_mel.domain.port.output.RefreshTokenRepositoryPort;
+import com.tech_mel.tech_mel.application.exception.NotFoundException;
+import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
+import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
+import com.tech_mel.tech_mel.domain.port.output.RefreshTokenRepositoryPort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,10 +40,10 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     @Transactional()
     public RefreshToken verifyRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
-                .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
+                .orElseThrow(() -> new NotFoundException("Refresh token not found"));
 
         if (refreshToken.isExpired()) {
-            throw new TokenExpiredException("Token de refresh expirado ou revogado");
+            throw new UnauthorizedException("Token de refresh expirado ou revogado");
         }
 
         return refreshToken;
@@ -54,7 +53,7 @@ public class RefreshTokenService implements RefreshTokenUseCase {
     @Transactional
     public void revokeRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepositoryPort.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Token de refresh não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Token de refresh não encontrado"));
 
         refreshTokenRepositoryPort.deleteByToken(refreshToken.getToken());
     }

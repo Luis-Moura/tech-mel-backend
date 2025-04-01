@@ -1,7 +1,7 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
-import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
 import com.tech_mel.tech_mel.domain.model.User;
+import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

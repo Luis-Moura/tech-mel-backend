@@ -1,8 +1,8 @@
 package com.tech_mel.tech_mel.application.service;
 
-import com.tech_mel.tech_mel.application.exception.InvalidCredentialsException;
-import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
-import com.tech_mel.tech_mel.application.exception.UserNotFoundException;
+import com.tech_mel.tech_mel.application.exception.ConflictException;
+import com.tech_mel.tech_mel.application.exception.NotFoundException;
+import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
@@ -31,27 +31,25 @@ public class AuthService implements AuthUseCase {
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    //    private final JwtOperationsPort jwtOperationsPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
-//    private final JwtBlackListPort jwtBlackListPort;
 
     private final JwtPort jwtServicePort;
 
     @Override
     public String authenticateUser(String email, String password) {
         User user = userRepositoryPort.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o email: " + email));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new InvalidCredentialsException("Credenciais inválidas");
+            throw new UnauthorizedException("Credenciais inválidas");
         }
 
         if (!user.isEmailVerified()) {
-            throw new InvalidCredentialsException("E-mail não verificado. Por favor, verifique seu e-mail antes de fazer login.");
+            throw new UnauthorizedException("E-mail não verificado. Por favor, verifique seu e-mail antes de fazer login.");
         }
 
         if (!user.isEnabled() || user.isLocked()) {
-            throw new InvalidCredentialsException("Conta bloqueada ou desativada. Entre em contato com o suporte.");
+            throw new UnauthorizedException("Conta bloqueada ou desativada. Entre em contato com o suporte.");
         }
 
         // Atualiza o último login
@@ -72,7 +70,7 @@ public class AuthService implements AuthUseCase {
 
         if (existingUser != null) {
             if (existingUser.isEmailVerified()) {
-                throw new InvalidCredentialsException("E-mail já cadastrado");
+                throw new ConflictException("E-mail já cadastrado");
             } else {
                 existingUser.setPassword(passwordEncoder.encode(password));
                 existingUser.setName(name);
@@ -103,12 +101,12 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
-    public boolean verifyEmail(String token) {
+    public void verifyEmail(String token) {
         User user = userRepositoryPort.findByVerificationToken(token)
-                .orElseThrow(() -> new TokenExpiredException("Token de verificação inválido"));
+                .orElseThrow(() -> new UnauthorizedException("Token de verificação inválido ou expirado"));
 
         if (user.getTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new TokenExpiredException("Token de verificação expirado");
+            throw new UnauthorizedException("Token de verificação inválido ou expirado");
         }
 
         user.setEmailVerified(true);
@@ -116,13 +114,12 @@ public class AuthService implements AuthUseCase {
         user.setTokenExpiry(null);
         userRepositoryPort.save(user);
 
-        return true;
     }
 
     @Override
     public User findUserByEmail(String email) {
         return userRepositoryPort.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com o email: " + email));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
     }
 
     @Override
@@ -149,13 +146,13 @@ public class AuthService implements AuthUseCase {
     @Override
     public void logout(String token) {
         if (!jwtServicePort.isTokenValid(token, "ACCESS")) {
-            throw new TokenExpiredException("Token inválido ou expirado");
+            throw new UnauthorizedException("Token inválido ou expirado");
         }
 
         String userEmail = jwtServicePort.extractUsername(token);
 
         User user = userRepositoryPort.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
         jwtServicePort.addToBlacklist(token);
 

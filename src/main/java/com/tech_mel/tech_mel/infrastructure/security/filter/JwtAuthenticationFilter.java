@@ -1,6 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
-import com.tech_mel.tech_mel.application.exception.TokenExpiredException;
+import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.port.output.JwtPort;
 import com.tech_mel.tech_mel.infrastructure.security.auth.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
@@ -32,22 +32,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7);
+        final String jwt = authHeader.substring(7);
 
         try {
             if (!jwtServicePort.isTokenValid(jwt, "ACCESS")) {
-                throw new TokenExpiredException("Token inválido ou expirado");
+                throw new UnauthorizedException("Token inválido ou expirado");
             }
 
-            userEmail = jwtServicePort.extractUsername(jwt);
+            String userEmail = jwtServicePort.extractUsername(jwt);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
@@ -58,26 +56,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetails.getAuthorities()
                 );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (TokenExpiredException e) {
-            SecurityContextHolder.clearContext();
 
-            request.setAttribute("exception", e);
+            filterChain.doFilter(request, response);
 
-            throw e;
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
-
             request.setAttribute("exception", e);
 
-            throw new TokenExpiredException(e.getMessage());
+            throw new UnauthorizedException("Erro de autenticação: " + e.getMessage());
         }
-
-        filterChain.doFilter(request, response);
     }
 }

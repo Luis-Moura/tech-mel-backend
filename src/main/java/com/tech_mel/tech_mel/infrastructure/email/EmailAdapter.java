@@ -1,6 +1,9 @@
 package com.tech_mel.tech_mel.infrastructure.email;
 
+import com.tech_mel.tech_mel.application.exception.BadRequestException;
 import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,9 +12,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 
 @Component
 @RequiredArgsConstructor
@@ -49,7 +49,7 @@ public class EmailAdapter implements EmailSenderPort {
             log.info("Email de verificação enviado para: {}", to);
         } catch (MessagingException e) {
             log.error("Erro ao enviar email de verificação para: {}", to, e);
-            throw new RuntimeException("Erro ao enviar email de verificação", e);
+            throw new BadRequestException("Erro ao enviar email de verificação");
         }
     }
 }

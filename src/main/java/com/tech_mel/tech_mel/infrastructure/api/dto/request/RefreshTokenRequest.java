@@ -1,12 +1,9 @@
 package com.tech_mel.tech_mel.infrastructure.api.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RefreshTokenRequest {
-    private String refreshToken;
+public record RefreshTokenRequest(
+        @NotBlank(message = "O refresh token é obrigatório")
+        String refreshToken
+) {
 }
