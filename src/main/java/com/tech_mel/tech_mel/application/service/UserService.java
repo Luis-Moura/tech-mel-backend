@@ -13,7 +13,13 @@ public class UserService implements UserUseCase {
     private final UserRepositoryPort userRepositoryPort;
 
     @Override
-    public User getCurrentUser(String email) {
+    public User getCurrentCommunUser(String email) {
+        return userRepositoryPort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+    }
+
+    @Override
+    public User getCurrentTechnicianUser(String email) {
         return userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }

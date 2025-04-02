@@ -59,6 +59,7 @@ public class AuthService implements AuthUseCase {
         // Gera o token JWT chamando a porta
         Map<String, Object> claims = new HashMap<>();
         claims.put("tokenType", "ACCESS");
+        claims.put("role", user.getRole().name());
 
         return jwtServicePort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
     }
