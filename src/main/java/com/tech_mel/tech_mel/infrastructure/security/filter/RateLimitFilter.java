@@ -24,9 +24,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NotNull HttpServletRequest request,
-            @NotNull HttpServletResponse response,
-            @NotNull FilterChain filterChain
+            @SuppressWarnings("null") @NotNull HttpServletRequest request,
+            @SuppressWarnings("null") @NotNull HttpServletResponse response,
+            @SuppressWarnings("null") @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         String ipAddress = getClientIP(request);
         String path = request.getRequestURI();

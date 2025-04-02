@@ -15,6 +15,15 @@ public class TechMelApplication {
         System.setProperty("spring.datasource.username", dotenv.get("DB_USERNAME"));
         System.setProperty("spring.datasource.password", dotenv.get("DB_PASSWORD"));
 
+        // Configuração do redis
+        System.setProperty("spring.data.redis.host", dotenv.get("REDIS_HOST"));
+        System.setProperty("spring.data.redis.port", dotenv.get("REDIS_PORT"));
+        System.setProperty("spring.data.redis.password", dotenv.get("REDIS_PASSWORD"));
+        System.setProperty("spring.data.redis.timeout", dotenv.get("REDIS_TIMEOUT"));
+        System.setProperty("spring.data.redis.lettuce.pool.max-active", dotenv.get("REDIS_POOL_MAX_TOTAL"));
+        System.setProperty("spring.data.redis.lettuce.pool.max-idle", dotenv.get("REDIS_POOL_MAX_IDLE"));
+        System.setProperty("spring.data.redis.lettuce.pool.min-idle", dotenv.get("REDIS_POOL_MIN_IDLE"));
+
         // Configurações do OAuth2
         System.setProperty("spring.security.oauth2.client.registration.google.client-id", dotenv.get("GOOGLE_CLIENT_ID"));
         System.setProperty("spring.security.oauth2.client.registration.google.client-secret", dotenv.get("GOOGLE_CLIENT_SECRET"));
