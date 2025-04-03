@@ -40,13 +40,32 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
     @GetMapping("technician/me")
     public ResponseEntity<UserResponse> getCurrentTechnicianUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
         User user = userUseCase.getCurrentTechnicianUser(email);
+
+        UserResponse response = UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .emailVerified(user.isEmailVerified())
+                .createdAt(user.getCreatedAt())
+                .lastLogin(user.getLastLogin())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("admin/me")
+    public ResponseEntity<UserResponse> getCurrentAdminUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userUseCase.getCurrentAdminUser(email);
 
         UserResponse response = UserResponse.builder()
                 .id(user.getId())

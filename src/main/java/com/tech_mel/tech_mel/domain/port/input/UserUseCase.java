@@ -6,4 +6,6 @@ public interface UserUseCase {
     User getCurrentCommunUser(String email);
 
     User getCurrentTechnicianUser(String email);
+
+    User getCurrentAdminUser(String email);
 }

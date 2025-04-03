@@ -23,4 +23,10 @@ public class UserService implements UserUseCase {
         return userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
+
+    @Override
+    public User getCurrentAdminUser(String email) {
+        return userRepositoryPort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+    }
 }
