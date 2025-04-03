@@ -1,10 +1,5 @@
 package com.tech_mel.tech_mel.application.exception;
 
-import java.nio.file.AccessDeniedException;
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,6 +11,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -59,17 +58,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNoHandlerFoundException(NoHandlerFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleNoHandlerFoundException() {
         return buildResponse(HttpStatus.NOT_FOUND, "Not Found", "O recurso solicitado não existe.");
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
-    public ResponseEntity<Map<String, Object>> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+    public ResponseEntity<Map<String, Object>> handleAuthorizationDeniedException() {
         return buildResponse(HttpStatus.FORBIDDEN, "Forbidden", "Acesso negado.");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadableException() {
         return buildResponse(HttpStatus.BAD_REQUEST, "Bad Request", "The Body of the Request Cannot be Empty or Have Extra Fields.");
     }
 
