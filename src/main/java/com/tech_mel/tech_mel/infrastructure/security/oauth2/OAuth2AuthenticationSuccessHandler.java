@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -40,29 +41,43 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             HttpServletRequest request, HttpServletResponse response,
             Authentication authentication
     ) throws IOException, ServletException {
-
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
-        String name = oAuth2User.getAttribute("name");
-        String sub = oAuth2User.getAttribute("sub");
 
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    // Criar um novo usuário caso não exista
-                    User newUser = User.builder()
-                            .email(email)
-                            .name(name)
-                            .password("")
-                            .providerId(sub)
-                            .authProvider(User.AuthProvider.GOOGLE)
-                            .emailVerified(true)
-                            .enabled(true)
-                            .role(User.Role.COMMON)
-                            .build();
-                    return userRepository.save(newUser);
-                });
+        // Em vez de buscar pelo ID, buscar pelo email
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
-        // Gerar token JWT
+        // Se não existir, criar um novo usuário
+        User user;
+        if (userOptional.isEmpty()) {
+            String name = oAuth2User.getAttribute("name");
+            String sub = oAuth2User.getAttribute("sub");
+
+            user = User.builder()
+                    .email(email)
+                    .name(name != null ? name : "Usuário Google")
+                    .password("")
+                    .providerId(sub)
+                    .authProvider(User.AuthProvider.GOOGLE)
+                    .emailVerified(true)
+                    .enabled(true)
+                    .role(User.Role.COMMON)
+                    .build();
+
+            user = userRepository.save(user);
+        } else {
+            user = userOptional.get();
+            // Verificar se é usuário LOCAL
+            if (user.getAuthProvider() == User.AuthProvider.LOCAL) {
+                String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+                        .queryParam("error", "Você já possui uma conta registrada com email e senha. Por favor, use essa forma de login.")
+                        .build().toUriString();
+                getRedirectStrategy().sendRedirect(request, response, targetUrl);
+                return;
+            }
+        }
+
+        // Gerar tokens JWT
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId().toString());
         claims.put("role", user.getRole().name());
@@ -70,11 +85,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         claims.put("tokenType", "ACCESS");
 
         String accessToken = jwtPort.generateToken(claims, user.getEmail(), jwtExpiration);
-
-        // Gerar refresh token
         RefreshToken refreshToken = refreshTokenUseCase.createRefreshToken(user);
 
-        // Construir URL de redirecionamento com tokens
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("token", accessToken)
                 .queryParam("refreshToken", refreshToken.getToken())

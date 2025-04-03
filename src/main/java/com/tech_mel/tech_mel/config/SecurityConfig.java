@@ -5,7 +5,6 @@ import com.tech_mel.tech_mel.infrastructure.security.filter.JwtAuthenticationFil
 import com.tech_mel.tech_mel.infrastructure.security.filter.RateLimitFilter;
 import com.tech_mel.tech_mel.infrastructure.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.tech_mel.tech_mel.infrastructure.security.oauth2.OAuth2AuthenticationSuccessHandler;
-import com.tech_mel.tech_mel.infrastructure.security.oauth2.OAuth2UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +30,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final RateLimitFilter rateLimitFilter;
-    private final OAuth2UserServiceImpl oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
@@ -73,8 +71,6 @@ public class SecurityConfig {
                                 .baseUri("/oauth2/authorize"))
                         .redirectionEndpoint(redirection -> redirection
                                 .baseUri("/login/oauth2/code/*"))
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(oAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                         .failureHandler(oAuth2AuthenticationFailureHandler)
                 )
