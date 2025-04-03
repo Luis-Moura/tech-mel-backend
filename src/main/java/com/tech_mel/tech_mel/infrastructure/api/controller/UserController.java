@@ -1,16 +1,17 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
-import com.tech_mel.tech_mel.domain.model.User;
-import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
-import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.tech_mel.tech_mel.domain.model.User;
+import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
+import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api")
