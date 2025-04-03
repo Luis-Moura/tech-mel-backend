@@ -32,9 +32,18 @@ public class User {
 
     private boolean enabled;
 
+    private AuthProvider authProvider;
+
+    private String providerId;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    public enum AuthProvider {
+        LOCAL,
+        GOOGLE,
+    }
 
     public enum Role {
         ADMIN,

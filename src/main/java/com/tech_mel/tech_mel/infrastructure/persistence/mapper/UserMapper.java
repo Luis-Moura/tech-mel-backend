@@ -24,6 +24,8 @@ public class UserMapper {
                 .verificationToken(entity.getVerificationToken())
                 .tokenExpiry(entity.getTokenExpiry())
                 .lastLogin(entity.getLastLogin())
+                .authProvider(mapAuthProviderToDomain(entity.getAuthProvider()))
+                .providerId(entity.getProviderId())
                 .build();
     }
 
@@ -44,6 +46,8 @@ public class UserMapper {
                 .verificationToken(domain.getVerificationToken())
                 .tokenExpiry(domain.getTokenExpiry())
                 .lastLogin(domain.getLastLogin())
+                .authProvider(mapAuthProviderToEntity(domain.getAuthProvider()))
+                .providerId(domain.getProviderId())
                 .build();
     }
 
@@ -66,6 +70,26 @@ public class UserMapper {
             case COMMON -> UserEntity.Role.COMMON;
             case ADMIN -> UserEntity.Role.ADMIN;
             case TECHNICIAN -> UserEntity.Role.TECHNICIAN;
+        };
+    }
+
+    private User.AuthProvider mapAuthProviderToDomain(UserEntity.AuthProvider entityAuthProvider) {
+        if (entityAuthProvider == null) {
+            return null;
+        }
+        return switch (entityAuthProvider) {
+            case LOCAL -> User.AuthProvider.LOCAL;
+            case GOOGLE -> User.AuthProvider.GOOGLE;
+        };
+    }
+
+    private UserEntity.AuthProvider mapAuthProviderToEntity(User.AuthProvider domainAuthProvider) {
+        if (domainAuthProvider == null) {
+            return null;
+        }
+        return switch (domainAuthProvider) {
+            case LOCAL -> UserEntity.AuthProvider.LOCAL;
+            case GOOGLE -> UserEntity.AuthProvider.GOOGLE;
         };
     }
 }
