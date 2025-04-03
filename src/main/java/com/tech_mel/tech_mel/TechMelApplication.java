@@ -27,6 +27,8 @@ public class TechMelApplication {
         System.setProperty("spring.data.redis.lettuce.pool.min-idle", Objects.requireNonNull(dotenv.get("REDIS_POOL_MIN_IDLE")));
 
         // Configurações do OAuth2
+        System.setProperty("app.oauth2.redirect-uri", Objects.requireNonNull(dotenv.get("REDIRECT_URI")));
+        System.setProperty("spring.security.oauth2.client.registration.google.redirect-uri", Objects.requireNonNull(dotenv.get("REDIRECT_URI")));
         System.setProperty("spring.security.oauth2.client.registration.google.client-id", Objects.requireNonNull(dotenv.get("GOOGLE_CLIENT_ID")));
         System.setProperty("spring.security.oauth2.client.registration.google.client-secret", Objects.requireNonNull(dotenv.get("GOOGLE_CLIENT_SECRET")));
 
