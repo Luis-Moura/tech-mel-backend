@@ -1,7 +1,9 @@
 package com.tech_mel.tech_mel.infrastructure.security.filter;
 
 import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
+import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.output.JwtPort;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtPort jwtServicePort;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Override
     protected void doFilterInternal(
@@ -39,6 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt = authHeader.substring(7);
 
         try {
+            User user = userRepositoryPort.findByEmail(jwtServicePort.extractUsername(jwt))
+                    .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado"));
+
+            if (!user.isEnabled()) {
+                throw new UnauthorizedException("Token inválido ou expirado");
+            }
+
             if (!jwtServicePort.isTokenValid(jwt, "ACCESS")) {
                 throw new UnauthorizedException("Token inválido ou expirado");
             }
