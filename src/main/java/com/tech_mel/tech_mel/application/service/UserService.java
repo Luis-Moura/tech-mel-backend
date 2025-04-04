@@ -6,7 +6,6 @@ import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
 import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
-import com.tech_mel.tech_mel.domain.port.output.JwtPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import java.util.UUID;
 public class UserService implements UserUseCase {
     private final UserRepositoryPort userRepositoryPort;
     private final EmailSenderPort emailSenderPort;
-    private final JwtPort jwtPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Override
@@ -50,14 +48,14 @@ public class UserService implements UserUseCase {
             throw new ConflictException("Usuário já excluído");
         }
 
+        emailSenderPort.sendUserDeletionEmail(user.getEmail(), user.getName());
+
         user.setEmail(user.getEmail() + ".deleted" + "." + user.getId());
         user.setName(user.getName() + " (excluído)");
         user.setEnabled(false);
         user.setRole(null);
 
         refreshTokenUseCase.revokeAllUserTokens(user);
-
-        emailSenderPort.sendUserDeletionEmail(user.getEmail(), user.getName());
 
         userRepositoryPort.save(user);
     }
