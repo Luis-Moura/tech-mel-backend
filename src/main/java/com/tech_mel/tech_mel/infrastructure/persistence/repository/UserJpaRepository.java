@@ -15,8 +15,4 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
     Optional<UserEntity> findByEmail(String email);
 
     Optional<UserEntity> findByVerificationToken(String token);
-
-    @Modifying
-    @Query("UPDATE UserEntity u SET u.enabled = false WHERE u.id = :id")
-    void softDeleteUser(@Param("id") UUID id);
 }

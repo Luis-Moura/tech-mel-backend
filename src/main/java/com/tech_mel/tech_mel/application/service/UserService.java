@@ -50,10 +50,15 @@ public class UserService implements UserUseCase {
             throw new ConflictException("Usuário já excluído");
         }
 
-        emailSenderPort.sendUserDeletionEmail(user.getEmail(), user.getName());
+        user.setEmail(user.getEmail() + ".deleted" + "." + user.getId());
+        user.setName(user.getName() + " (excluído)");
+        user.setEnabled(false);
+        user.setRole(null);
 
         refreshTokenUseCase.revokeAllUserTokens(user);
 
-        userRepositoryPort.softDeleteUser(id);
+        emailSenderPort.sendUserDeletionEmail(user.getEmail(), user.getName());
+
+        userRepositoryPort.save(user);
     }
 }

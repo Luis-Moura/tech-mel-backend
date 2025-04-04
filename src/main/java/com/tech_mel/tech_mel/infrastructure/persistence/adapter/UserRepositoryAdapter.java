@@ -42,9 +42,4 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return userJpaRepository.findByVerificationToken(token)
                 .map(userMapper::toDomain);
     }
-
-    @Override
-    public void softDeleteUser(UUID id) {
-        userJpaRepository.softDeleteUser(id);
-    }
 }

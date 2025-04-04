@@ -13,6 +13,4 @@ public interface UserRepositoryPort {
     User save(User user);
 
     Optional<User> findByVerificationToken(String token);
-
-    void softDeleteUser(UUID id);
 }
