@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public Optional<User> findById(UUID id) {
+        return userJpaRepository.findById(id)
+                .map(userMapper::toDomain);
+    }
+
+    @Override
     public User save(User user) {
         UserEntity entity = userMapper.toEntity(user);
         UserEntity savedEntity = userJpaRepository.save(entity);
@@ -34,5 +41,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public Optional<User> findByVerificationToken(String token) {
         return userJpaRepository.findByVerificationToken(token)
                 .map(userMapper::toDomain);
+    }
+
+    @Override
+    public void softDeleteUser(UUID id) {
+        userJpaRepository.softDeleteUser(id);
     }
 }
