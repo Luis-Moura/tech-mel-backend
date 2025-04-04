@@ -3,15 +3,15 @@ package com.tech_mel.tech_mel.infrastructure.api.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -79,5 +79,11 @@ public class UserController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/users/delete/{id}")
+    public ResponseEntity<Void> softDeleteUser(@PathVariable("id") String id) {
+        userUseCase.softDeleteUser(UUID.fromString(id));
+        return ResponseEntity.noContent().build();
     }
 }
