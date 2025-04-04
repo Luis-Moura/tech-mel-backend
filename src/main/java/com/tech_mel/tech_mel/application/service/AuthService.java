@@ -38,7 +38,11 @@ public class AuthService implements AuthUseCase {
     @Override
     public String authenticateUser(String email, String password) {
         User user = userRepositoryPort.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
+                .orElseThrow(() -> new NotFoundException("Credenciais inválidas"));
+
+        if (user.getAuthProvider() != User.AuthProvider.LOCAL) {
+            throw new UnauthorizedException("Usuário não cadastrado com e-mail e senha");
+        }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UnauthorizedException("Credenciais inválidas");
@@ -74,6 +78,7 @@ public class AuthService implements AuthUseCase {
                 throw new ConflictException("E-mail já cadastrado");
             } else {
                 existingUser.setPassword(passwordEncoder.encode(password));
+                existingUser.setAuthProvider(User.AuthProvider.LOCAL);
                 existingUser.setName(name);
                 existingUser.setEnabled(true);
                 existingUser.setLocked(false);
@@ -87,6 +92,7 @@ public class AuthService implements AuthUseCase {
         User user = User.builder()
                 .email(email)
                 .password(passwordEncoder.encode(password))
+                .authProvider(User.AuthProvider.LOCAL)
                 .name(name)
                 .emailVerified(false)
                 .role(User.Role.COMMON)
