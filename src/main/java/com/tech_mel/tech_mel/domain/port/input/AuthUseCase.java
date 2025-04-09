@@ -7,6 +7,8 @@ public interface AuthUseCase {
 
     void registerUser(String email, String password, String name);
 
+    void resendVerificationEmail(String email);
+
     void verifyEmail(String token);
 
     String generateVerificationToken(User user);

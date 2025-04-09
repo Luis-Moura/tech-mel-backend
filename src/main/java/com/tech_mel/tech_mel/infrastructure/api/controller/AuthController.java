@@ -8,6 +8,7 @@ import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.AuthRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.RefreshTokenRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.RegistrationRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.ResendEmailVerificationRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,12 @@ public class AuthController {
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request) {
         authUseCase.registerUser(request.email(), request.password(), request.name());
         return ResponseEntity.ok().body(Map.of("message", "Usuário registrado com sucesso. Verifique seu e-mail para ativar a conta."));
+    }
+
+    @PostMapping("/resend-verification-email")
+    public ResponseEntity<?> resendVerificationEmail(@Valid @RequestParam ResendEmailVerificationRequest request) {
+        authUseCase.resendVerificationEmail(request.email());
+        return ResponseEntity.ok().body(Map.of("message", "E-mail de verificação reenviado com sucesso."));
     }
 
     @PostMapping("/refresh")

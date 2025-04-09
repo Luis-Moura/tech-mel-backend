@@ -1,6 +1,5 @@
 package com.tech_mel.tech_mel.infrastructure.security.oauth2;
 
-import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;

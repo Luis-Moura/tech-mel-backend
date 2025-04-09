@@ -108,6 +108,19 @@ public class AuthService implements AuthUseCase {
     }
 
     @Override
+    public void resendVerificationEmail(String email) {
+        User user = userRepositoryPort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
+
+        if (user.isEmailVerified()) {
+            throw new ConflictException("E-mail já verificado");
+        }
+
+        String verificationToken = generateVerificationToken(user);
+        eventPublisher.publishEvent(new UserRegisteredEvent(user, verificationToken));
+    }
+
+    @Override
     public void verifyEmail(String token) {
         User user = userRepositoryPort.findByVerificationToken(token)
                 .orElseThrow(() -> new UnauthorizedException("Token de verificação inválido ou expirado"));
