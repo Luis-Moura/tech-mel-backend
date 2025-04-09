@@ -33,7 +33,7 @@ public class AuthService implements AuthUseCase {
     private final ApplicationEventPublisher eventPublisher;
     private final RefreshTokenUseCase refreshTokenUseCase;
 
-    private final JwtPort jwtServicePort;
+    private final JwtPort jwtPort;
 
     @Override
     public String authenticateUser(String email, String password) {
@@ -65,7 +65,7 @@ public class AuthService implements AuthUseCase {
         claims.put("tokenType", "ACCESS");
         claims.put("role", user.getRole().name());
 
-        return jwtServicePort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
+        return jwtPort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
     }
 
     @Override
@@ -147,21 +147,21 @@ public class AuthService implements AuthUseCase {
         Map<String, Object> claims = new HashMap<>();
         claims.put("tokenType", "ACCESS");
 
-        return jwtServicePort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
+        return jwtPort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min
     }
 
     @Override
     public void logout(String token) {
-        if (!jwtServicePort.isTokenValid(token, "ACCESS")) {
+        if (!jwtPort.isTokenValid(token, "ACCESS")) {
             throw new UnauthorizedException("Token inválido ou expirado");
         }
 
-        String userEmail = jwtServicePort.extractUsername(token);
+        String userEmail = jwtPort.extractUsername(token);
 
         User user = userRepositoryPort.findByEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        jwtServicePort.addToBlacklist(token);
+        jwtPort.addToBlacklist(token);
 
         refreshTokenUseCase.revokeAllUserTokens(user);
     }

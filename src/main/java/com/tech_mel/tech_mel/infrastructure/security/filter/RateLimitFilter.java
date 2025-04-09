@@ -48,7 +48,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private boolean isAuthenticationRequest(String path) {
-        return path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register");
+        return path.startsWith("/api/auth/");
     }
 
     private String getClientIP(HttpServletRequest request) {

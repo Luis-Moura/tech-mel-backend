@@ -1,5 +1,6 @@
 package com.tech_mel.tech_mel.infrastructure.security.oauth2;
 
+import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
@@ -74,6 +75,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 getRedirectStrategy().sendRedirect(request, response, targetUrl);
                 return;
             }
+        }
+
+        if (user.getRole() != User.Role.COMMON) {
+            String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+                    .queryParam("error", "Apenas usuários comuns podem usar o login com Google.")
+                    .build().toUriString();
+            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            return;
         }
 
         // Gerar tokens JWT
