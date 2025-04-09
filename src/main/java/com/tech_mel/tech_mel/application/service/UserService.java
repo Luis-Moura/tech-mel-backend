@@ -21,19 +21,7 @@ public class UserService implements UserUseCase {
     private final RefreshTokenUseCase refreshTokenUseCase;
 
     @Override
-    public User getCurrentCommunUser(String email) {
-        return userRepositoryPort.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
-    }
-
-    @Override
-    public User getCurrentTechnicianUser(String email) {
-        return userRepositoryPort.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
-    }
-
-    @Override
-    public User getCurrentAdminUser(String email) {
+    public User getCurrentUser(String email) {
         return userRepositoryPort.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
