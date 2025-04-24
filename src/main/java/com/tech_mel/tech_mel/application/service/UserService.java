@@ -9,10 +9,12 @@ import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserUseCase {
@@ -29,6 +31,7 @@ public class UserService implements UserUseCase {
     @Override
     @Transactional
     public void softDeleteUser(UUID id) {
+        log.info("Tentativa de exclusão lógica do usuário com ID: {}", id);
         User user = userRepositoryPort.findById(id)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
