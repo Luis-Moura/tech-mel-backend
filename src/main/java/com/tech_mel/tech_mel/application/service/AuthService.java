@@ -194,7 +194,7 @@ public class AuthService implements AuthUseCase {
         }
 
         UUID resetToken = UUID.randomUUID();
-        String redisKey = "password-reset:" + resetToken.toString();
+        String redisKey = "password-reset:" + resetToken;
 
         // Armazenando o userId como String
         redisTemplate.opsForValue().set(redisKey, user.getId().toString(), Duration.ofMinutes(15));
