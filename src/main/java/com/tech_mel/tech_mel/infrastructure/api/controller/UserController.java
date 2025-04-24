@@ -2,7 +2,9 @@ package com.tech_mel.tech_mel.infrastructure.api.controller;
 
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.ChangePasswordRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,6 +39,15 @@ public class UserController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        userUseCase.changePassword(email, request.newPassword(), request.oldPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/users/delete/{id}")

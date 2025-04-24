@@ -8,4 +8,6 @@ public interface UserUseCase {
     User getCurrentUser(String email);
 
     void softDeleteUser(UUID id);
+
+    void changePassword(String email, String newPassword, String oldPassword);
 }

@@ -10,6 +10,7 @@ import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class UserService implements UserUseCase {
     private final UserRepositoryPort userRepositoryPort;
     private final EmailSenderPort emailSenderPort;
     private final RefreshTokenUseCase refreshTokenUseCase;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User getCurrentUser(String email) {
@@ -49,5 +51,31 @@ public class UserService implements UserUseCase {
         refreshTokenUseCase.revokeAllUserTokens(user);
 
         userRepositoryPort.save(user);
+    }
+
+    @Override
+    public void changePassword(String email, String newPassword, String oldPassword) {
+        log.info("Tentativa de alteração de senha do usuário com email: {}", email);
+        User user = userRepositoryPort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        if (user.getAuthProvider() == User.AuthProvider.GOOGLE) {
+            log.warn("Tentativa de alteração de senha para conta Google: {}", email);
+            throw new ConflictException("Usuários com login pelo Google não podem alterar a senha");
+        }
+
+        if (newPassword.equals(oldPassword)) {
+            log.warn("Tentativa de alteração de senha com a mesma senha atual: {}", email);
+            throw new ConflictException("A nova senha não pode ser igual à senha atual");
+        }
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            log.warn("Senha atual incorreta na tentativa de alteração para: {}", email);
+            throw new ConflictException("Senha atual incorreta");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepositoryPort.save(user);
+        log.info("Senha alterada com sucesso para: {}", email);
     }
 }
