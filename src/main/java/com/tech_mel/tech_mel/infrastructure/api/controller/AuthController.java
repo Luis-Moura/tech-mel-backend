@@ -91,4 +91,11 @@ public class AuthController {
 
         return ResponseEntity.ok().body(Map.of("message", "Logout realizado com sucesso"));
     }
+
+    @GetMapping("/password-reset/request")
+    public ResponseEntity<?> requestPasswordReset(@RequestParam String email) {
+        authUseCase.requestPasswordReset(email);
+
+        return ResponseEntity.ok().body(Map.of("message", "E-mail de redefinição de senha enviado com sucesso."));
+    }
 }
