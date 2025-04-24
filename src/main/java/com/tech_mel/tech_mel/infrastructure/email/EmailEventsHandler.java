@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.application.service;
+package com.tech_mel.tech_mel.infrastructure.email;
 
 import com.tech_mel.tech_mel.domain.event.PasswordResetEvent;
 import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmailService {
+public class EmailEventsHandler {
 
     private final EmailSenderPort emailSenderPort;
 
