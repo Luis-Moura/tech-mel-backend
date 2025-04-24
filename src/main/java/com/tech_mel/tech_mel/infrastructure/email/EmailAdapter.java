@@ -25,6 +25,9 @@ public class EmailAdapter implements EmailSenderPort {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("${app.url.frontend}")
+    private String appUrlFrontend;
+
     @Value("${spring.mail.from}")
     private String fromEmail;
 
@@ -77,6 +80,32 @@ public class EmailAdapter implements EmailSenderPort {
         } catch (MessagingException e) {
             log.error("Erro ao enviar email de deleção para: {}", to, e);
             throw new BadRequestException("Erro ao enviar email de deleção");
+        }
+    }
+
+    @Override
+    public void sendPasswordResetEmail(String to, String name, String verificationToken) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            Context context = new Context();
+            context.setVariable("name", name);
+            context.setVariable("resetUrl",
+                    appUrlFrontend + "/api/auth/reset-password?token=" + verificationToken);
+
+            String htmlContent = templateEngine.process("/email-reset-password", context);
+
+            helper.setTo(to);
+            helper.setFrom(fromEmail);
+            helper.setSubject("Redefinição de Senha - Tech Mel");
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Email de redefinição de senha enviado para: {}", to);
+        } catch (MessagingException e) {
+            log.error("Erro ao enviar email de redefinição de senha para: {}", to, e);
+            throw new BadRequestException("Erro ao enviar email de redefinição de senha");
         }
     }
 }

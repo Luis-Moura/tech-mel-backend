@@ -1,5 +1,6 @@
 package com.tech_mel.tech_mel.application.service;
 
+import com.tech_mel.tech_mel.domain.event.PasswordResetEvent;
 import com.tech_mel.tech_mel.domain.port.output.EmailSenderPort;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.User;
@@ -22,5 +23,12 @@ public class EmailService {
         User user = event.user();
         emailSenderPort.sendVerificationEmail(user.getEmail(), user.getName(), event.verificationToken());
         log.info("Evento de registro de usuário processado para: {}", user.getEmail());
+    }
+
+    @EventListener
+    @Async
+    public void handlePasswordResetEvent(PasswordResetEvent event) {
+        emailSenderPort.sendPasswordResetEmail(event.email(), event.name(), event.passwordResetToken());
+        log.info("Evento de redefinição de senha processado para: {}", event.email());
     }
 }
