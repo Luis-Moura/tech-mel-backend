@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -84,7 +86,7 @@ public class EmailAdapter implements EmailSenderPort {
     }
 
     @Override
-    public void sendPasswordResetEmail(String to, String name, String verificationToken) {
+    public void sendPasswordResetEmail(String to, String name, UUID verificationToken) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

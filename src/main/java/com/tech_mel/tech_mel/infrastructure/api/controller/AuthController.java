@@ -1,22 +1,30 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
+import java.util.Map;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.AuthRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.ForgotPasswordRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.RefreshTokenRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.RegistrationRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.ResendEmailVerificationRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.ResetPasswordRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.AuthResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -92,10 +100,17 @@ public class AuthController {
         return ResponseEntity.ok().body(Map.of("message", "Logout realizado com sucesso"));
     }
 
-    @GetMapping("/password-reset/request")
-    public ResponseEntity<?> requestPasswordReset(@RequestParam String email) {
-        authUseCase.requestPasswordReset(email);
+    @GetMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authUseCase.requestPasswordReset(request.email());
 
         return ResponseEntity.ok().body(Map.of("message", "E-mail de redefinição de senha enviado com sucesso."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authUseCase.resetPassword(UUID.fromString(request.token()), request.newPassword());
+
+        return ResponseEntity.ok().body(Map.of("message", "Senha redefinida com sucesso."));
     }
 }

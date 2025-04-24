@@ -35,7 +35,7 @@ public class AuthService implements AuthUseCase {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final RefreshTokenUseCase refreshTokenUseCase;
-    private final RedisTemplate<String, UUID> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     private final JwtPort jwtPort;
 
@@ -193,15 +193,42 @@ public class AuthService implements AuthUseCase {
             throw new UnauthorizedException("Usuário não cadastrado com e-mail e senha");
         }
 
-        String resetToken = UUID.randomUUID().toString();
+        UUID resetToken = UUID.randomUUID();
+        String redisKey = "password-reset:" + resetToken.toString();
 
-        redisTemplate.opsForValue().set("password-reset:" + resetToken, user.getId(), Duration.ofMinutes(15));
+        // Armazenando o userId como String
+        redisTemplate.opsForValue().set(redisKey, user.getId().toString(), Duration.ofMinutes(15));
 
         eventPublisher.publishEvent(new PasswordResetEvent(user.getEmail(), user.getName(), resetToken));
     }
 
     @Override
-    public void resetPassword(String token, String newPassword) {
+    public void resetPassword(UUID token, String newPassword) {
+        String redisKey = "password-reset:" + token.toString();
+        String userIdStr = redisTemplate.opsForValue().get(redisKey);
 
+        if (userIdStr == null) {
+            throw new UnauthorizedException("Token de redefinição de senha inválido ou expirado");
+        }
+
+        UUID userId;
+
+        try {
+            userId = UUID.fromString(userIdStr);
+        } catch (IllegalArgumentException e) {
+            throw new UnauthorizedException("Token de redefinição de senha inválido");
+        }
+
+        User user = userRepositoryPort.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        if (user.getAuthProvider() == User.AuthProvider.GOOGLE) {
+            throw new UnauthorizedException("Usuário não cadastrado com e-mail e senha");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepositoryPort.save(user);
+
+        redisTemplate.delete(redisKey);
     }
 }
