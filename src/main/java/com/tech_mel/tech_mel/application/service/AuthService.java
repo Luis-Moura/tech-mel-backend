@@ -3,6 +3,7 @@ package com.tech_mel.tech_mel.application.service;
 import com.tech_mel.tech_mel.application.exception.ConflictException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
+import com.tech_mel.tech_mel.domain.event.PasswordResetEvent;
 import com.tech_mel.tech_mel.domain.event.UserRegisteredEvent;
 import com.tech_mel.tech_mel.domain.model.RefreshToken;
 import com.tech_mel.tech_mel.domain.model.User;
@@ -13,9 +14,11 @@ import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +35,7 @@ public class AuthService implements AuthUseCase {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final RefreshTokenUseCase refreshTokenUseCase;
+    private final RedisTemplate<String, UUID> redisTemplate;
 
     private final JwtPort jwtPort;
 
@@ -177,5 +181,27 @@ public class AuthService implements AuthUseCase {
         jwtPort.addToBlacklist(token);
 
         refreshTokenUseCase.revokeAllUserTokens(user);
+    }
+
+
+    @Override
+    public void requestPasswordReset(String email) {
+        User user = userRepositoryPort.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
+
+        if (user.getAuthProvider() == User.AuthProvider.GOOGLE) {
+            throw new UnauthorizedException("Usuário não cadastrado com e-mail e senha");
+        }
+
+        String resetToken = UUID.randomUUID().toString();
+
+        redisTemplate.opsForValue().set("password-reset:" + resetToken, user.getId(), Duration.ofMinutes(15));
+
+        eventPublisher.publishEvent(new PasswordResetEvent(user.getEmail(), user.getName(), resetToken));
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+
     }
 }

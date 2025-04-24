@@ -18,4 +18,8 @@ public interface AuthUseCase {
     User findUserByEmail(String email);
 
     void logout(String token);
+
+    void requestPasswordReset(String email);
+
+    void resetPassword(String token, String newPassword);
 }
