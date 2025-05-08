@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,15 +43,15 @@ public class UserController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
 
         userUseCase.changePassword(email, request.newPassword(), request.oldPassword());
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso!"));
     }
 
-    @PutMapping("/users/delete/{id}")
+    @PutMapping("/delete/{id}")
     public ResponseEntity<Void> softDeleteUser(@PathVariable("id") String id) {
         userUseCase.softDeleteUser(UUID.fromString(id));
         return ResponseEntity.noContent().build();

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -75,6 +76,7 @@ public class AuthService implements AuthUseCase {
             // Gera o token JWT chamando a porta
             Map<String, Object> claims = new HashMap<>();
             claims.put("tokenType", "ACCESS");
+            claims.put("user-id", user.getId());
             claims.put("role", user.getRole().name());
 
             return jwtPort.generateToken(claims, user.getEmail(), jwtExpiration); // 30 min
@@ -165,6 +167,8 @@ public class AuthService implements AuthUseCase {
 
             Map<String, Object> claims = new HashMap<>();
             claims.put("tokenType", "ACCESS");
+            claims.put("user-id", token.getUser().getId());
+            claims.put("role", token.getUser().getRole().name());
 
             log.info("Refresh token bem-sucedido para usuário: {}", token.getUser().getEmail());
             return jwtPort.generateToken(claims, token.getUser().getEmail(), 30 * 60 * 1000L); // 30 min

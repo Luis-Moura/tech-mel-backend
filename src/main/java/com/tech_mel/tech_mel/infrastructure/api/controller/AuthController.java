@@ -2,6 +2,7 @@ package com.tech_mel.tech_mel.infrastructure.api.controller;
 
 import java.util.Map;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,14 +101,14 @@ public class AuthController {
         return ResponseEntity.ok().body(Map.of("message", "Logout realizado com sucesso"));
     }
 
-    @GetMapping("/forgot-password")
+    @GetMapping("/forgot-password/request")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authUseCase.requestPasswordReset(request.email());
 
         return ResponseEntity.ok().body(Map.of("message", "E-mail de redefinição de senha enviado com sucesso."));
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/forgot-password/reset")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authUseCase.resetPassword(UUID.fromString(request.token()), request.newPassword());
 

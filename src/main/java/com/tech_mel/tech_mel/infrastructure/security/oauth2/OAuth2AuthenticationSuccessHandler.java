@@ -86,10 +86,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // Gerar tokens JWT
         Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "ACCESS");
         claims.put("userId", user.getId().toString());
         claims.put("role", user.getRole().name());
-        claims.put("email", user.getEmail());
-        claims.put("tokenType", "ACCESS");
 
         String accessToken = jwtPort.generateToken(claims, user.getEmail(), jwtExpiration);
         RefreshToken refreshToken = refreshTokenUseCase.createRefreshToken(user);
