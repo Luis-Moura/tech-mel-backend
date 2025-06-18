@@ -1,5 +1,8 @@
 package com.tech_mel.tech_mel.application.service;
 
+import java.util.UUID;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import com.tech_mel.tech_mel.application.exception.ConflictException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.User;
@@ -10,10 +13,6 @@ import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,8 +24,8 @@ public class UserService implements UserUseCase {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User getCurrentUser(String email) {
-        return userRepositoryPort.findByEmail(email)
+    public User getCurrentUser(UUID userId) {
+        return userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
     }
 

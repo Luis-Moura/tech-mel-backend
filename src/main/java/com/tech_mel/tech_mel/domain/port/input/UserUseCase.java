@@ -1,11 +1,10 @@
 package com.tech_mel.tech_mel.domain.port.input;
 
+import java.util.UUID;
 import com.tech_mel.tech_mel.domain.model.User;
 
-import java.util.UUID;
-
 public interface UserUseCase {
-    User getCurrentUser(String email);
+    User getCurrentUser(UUID userId);
 
     void softDeleteUser(UUID id);
 

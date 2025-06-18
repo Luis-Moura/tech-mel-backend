@@ -1,18 +1,20 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
+import java.util.Map;
+import java.util.UUID;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.UserUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.ChangePasswordRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.UserResponse;
+import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,40 +22,43 @@ import java.util.UUID;
 public class UserController {
 
     private final UserUseCase userUseCase;
+    private final AuthenticationUtil authenticationUtil;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Usar o UUID como principal para busca direta
+        UUID userId = authenticationUtil.getCurrentUserId();
+        
+        User currentUser = userUseCase.getCurrentUser(userId);
 
-        String email = authentication.getName();
-
-        User user = userUseCase.getCurrentUser(email);
-
-        UserResponse response = UserResponse.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .emailVerified(user.isEmailVerified())
-                .createdAt(user.getCreatedAt())
-                .lastLogin(user.getLastLogin())
+        UserResponse userResponse = UserResponse.builder()
+                .id(currentUser.getId())
+                .name(currentUser.getName())
+                .email(currentUser.getEmail())
+                .role(currentUser.getRole())
+                .emailVerified(currentUser.isEmailVerified())
+                .createdAt(currentUser.getCreatedAt())
+                .lastLogin(currentUser.getLastLogin())
                 .build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(userResponse);
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        // Usar o email das claims do JWT
+        String email = authenticationUtil.getCurrentUserEmail();
 
         userUseCase.changePassword(email, request.newPassword(), request.oldPassword());
         return ResponseEntity.ok(Map.of("message", "Senha alterada com sucesso!"));
     }
 
-    @PutMapping("/delete/{id}")
-    public ResponseEntity<Void> softDeleteUser(@PathVariable("id") String id) {
-        userUseCase.softDeleteUser(UUID.fromString(id));
+    @PutMapping("/delete")
+    public ResponseEntity<Void> softDeleteUser() {
+        // Usar o UUID como principal para busca direta
+        UUID userId = authenticationUtil.getCurrentUserId();
+        
+        userUseCase.softDeleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }
