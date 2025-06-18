@@ -60,18 +60,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 var claims = jwtServicePort.extractAllClaims(jwt);
                 String role = (String) claims.get("role");
+                String userId = (String) claims.get("userId");
 
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
+                // Usar o UUID como principal, não o email
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        username,
+                        userId, // Principal é o UUID do usuário
                         null,
                         authorities
                 );
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                log.info("JWT autenticado com sucesso para: {}", username);
+                log.info("JWT autenticado com sucesso para: {} (UUID: {})", username, userId);
             }
 
             filterChain.doFilter(request, response);
