@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.infrastructure.api.dto.response;
+package com.tech_mel.tech_mel.infrastructure.api.dto.response.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
