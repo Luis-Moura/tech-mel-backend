@@ -6,6 +6,8 @@ import com.tech_mel.tech_mel.infrastructure.persistence.entity.HiveEntity;
 import com.tech_mel.tech_mel.infrastructure.persistence.mapper.HiveMapper;
 import com.tech_mel.tech_mel.infrastructure.persistence.repository.HiveJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -32,10 +34,9 @@ public class HiveRepositoryAdapter implements HiveRepositoryPort {
     }
 
     @Override
-    public List<Hive> findByOwnerId(UUID ownerId) {
-        return repository.findByOwner_Id(ownerId).stream()
-                .map(hiveMapper::toDomain)
-                .toList();
+    public Page<Hive> findByOwnerId(UUID ownerId, Pageable pageable) {
+        Page<HiveEntity> hiveEntityPage = repository.findByOwner_Id(ownerId, pageable);
+        return hiveEntityPage.map(hiveMapper::toDomain);
     }
 
     @Override

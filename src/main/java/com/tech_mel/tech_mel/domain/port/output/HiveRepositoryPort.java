@@ -1,6 +1,8 @@
 package com.tech_mel.tech_mel.domain.port.output;
 
 import com.tech_mel.tech_mel.domain.model.Hive;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +13,7 @@ public interface HiveRepositoryPort {
 
     Optional<Hive> findById(UUID hiveId);
 
-    List<Hive> findByOwnerId(UUID ownerId);
+    Page<Hive> findByOwnerId(UUID ownerId, Pageable pageable);
 
     void deleteById(UUID hiveId);
 
