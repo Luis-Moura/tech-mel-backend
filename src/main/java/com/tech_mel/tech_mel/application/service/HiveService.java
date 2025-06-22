@@ -10,6 +10,8 @@ import com.tech_mel.tech_mel.infrastructure.api.dto.request.hive.CreateHiveReque
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,15 +52,14 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
-    public List<Hive> listHivesMyHives(UUID owner) {
-        return List.of();
+    public Page<Hive> listMyHives(UUID owner, Pageable pageable) {
+        return hiveRepositoryPort.findByOwnerId(owner, pageable);
     }
 
     @Override
-    public List<Hive> listAllHives() {
-        return List.of();
+    public Page<Hive> listAllHives() {
+        return null;
     }
-
 
     @Override
     public Optional<Hive> getHiveById(UUID hiveId) {
