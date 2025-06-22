@@ -36,6 +36,8 @@ public class User {
 
     private String providerId;
 
+    private int availableHives;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

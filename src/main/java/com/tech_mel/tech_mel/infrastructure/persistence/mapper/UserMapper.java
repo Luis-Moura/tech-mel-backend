@@ -26,6 +26,7 @@ public class UserMapper {
                 .lastLogin(entity.getLastLogin())
                 .authProvider(mapAuthProviderToDomain(entity.getAuthProvider()))
                 .providerId(entity.getProviderId())
+                .availableHives(entity.getAvailableHives())
                 .build();
     }
 
@@ -48,6 +49,7 @@ public class UserMapper {
                 .lastLogin(domain.getLastLogin())
                 .authProvider(mapAuthProviderToEntity(domain.getAuthProvider()))
                 .providerId(domain.getProviderId())
+                .availableHives(domain.getAvailableHives())
                 .build();
     }
 

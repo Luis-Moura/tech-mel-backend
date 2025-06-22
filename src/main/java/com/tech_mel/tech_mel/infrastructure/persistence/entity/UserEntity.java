@@ -55,6 +55,9 @@ public class UserEntity {
     @Column(name = "provider_id")
     private String providerId;
 
+    @Column(name = "available_hives")
+    private int availableHives = 0;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
