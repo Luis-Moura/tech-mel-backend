@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/hives")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class HiveController {
     private final HiveUseCase hiveUseCase;
     private final AuthenticationUtil authenticationUtil;
 
-    @PostMapping()
+    @PostMapping("/technician/hives")
     @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
     public ResponseEntity<HiveResponse> createHive(@Valid @RequestBody CreateHiveRequest request) {
         Hive createdHive = hiveUseCase.createHive(request);
@@ -41,7 +41,7 @@ public class HiveController {
         return ResponseEntity.status(HttpStatus.CREATED).body(hiveResponse);
     }
 
-    @GetMapping("/my-hives")
+    @GetMapping("/hives")
     public ResponseEntity<Page<GetMyHivesResponse>> getMyhives(Pageable pageable) {
         UUID userId = authenticationUtil.getCurrentUserId();
 
