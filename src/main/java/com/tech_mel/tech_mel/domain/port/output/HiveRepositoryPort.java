@@ -4,7 +4,6 @@ import com.tech_mel.tech_mel.domain.model.Hive;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
