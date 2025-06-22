@@ -51,13 +51,8 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
-    public Page<Hive> listMyHives(UUID owner, Pageable pageable) {
+    public Page<Hive> listHivesByOwner(UUID owner, Pageable pageable) {
         return hiveRepositoryPort.findByOwnerId(owner, pageable);
-    }
-
-    @Override
-    public Page<Hive> listAllHives() {
-        return null;
     }
 
     @Override

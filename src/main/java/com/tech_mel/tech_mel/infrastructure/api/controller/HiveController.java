@@ -45,7 +45,7 @@ public class HiveController {
     public ResponseEntity<Page<GetMyHivesResponse>> getMyhives(Pageable pageable) {
         UUID userId = authenticationUtil.getCurrentUserId();
 
-        Page<Hive> page = hiveUseCase.listMyHives(userId, pageable);
+        Page<Hive> page = hiveUseCase.listHivesByOwner(userId, pageable);
 
         Page<GetMyHivesResponse> response = page.map(hive -> GetMyHivesResponse.builder()
                 .id(hive.getId())
