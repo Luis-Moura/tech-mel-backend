@@ -13,10 +13,10 @@ import java.util.UUID;
 
 @Entity
 @Table(
-    name = "hives",
-    indexes = {
-        @Index(name = "idx_hives_owner_id", columnList = "owner_id")
-    }
+        name = "hives",
+        indexes = {
+                @Index(name = "idx_hives_owner_id", columnList = "owner_id")
+        }
 )
 @Getter
 @Setter
@@ -31,7 +31,7 @@ public class HiveEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String location;
 
     @Column(nullable = false, name = "api_key")
