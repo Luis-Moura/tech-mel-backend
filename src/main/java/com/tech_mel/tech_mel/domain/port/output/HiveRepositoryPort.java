@@ -17,8 +17,4 @@ public interface HiveRepositoryPort {
     Page<Hive> findAllHives(Pageable pageable);
 
     void deleteById(UUID hiveId);
-
-    void updateApiKey(UUID hiveId, String apiKey);
-
-    void updateStatus(UUID hiveId, Hive.HiveStatus newStatus);
 }
