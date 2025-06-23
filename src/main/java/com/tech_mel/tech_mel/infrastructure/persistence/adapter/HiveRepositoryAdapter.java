@@ -49,20 +49,4 @@ public class HiveRepositoryAdapter implements HiveRepositoryPort {
     public void deleteById(UUID hiveId) {
         repository.deleteById(hiveId);
     }
-
-    @Override
-    public void updateApiKey(UUID hiveId, String apiKey) {
-        repository.findById(hiveId).ifPresent(entity -> {
-            entity.setApiKey(apiKey);
-            repository.save(entity);
-        });
-    }
-
-    @Override
-    public void updateStatus(UUID hiveId, Hive.HiveStatus newStatus) {
-        repository.findById(hiveId).ifPresent(entity -> {
-            entity.setHiveStatus(newStatus);
-            repository.save(entity);
-        });
-    }
 }
