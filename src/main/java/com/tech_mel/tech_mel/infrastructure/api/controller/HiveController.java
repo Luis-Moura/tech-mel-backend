@@ -58,4 +58,21 @@ public class HiveController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/technician/hives/{ownerId}")
+    public ResponseEntity<Page<HiveResponse>> getHivesByOwner(@PathVariable UUID ownerId, Pageable pageable) {
+        Page<Hive> page = hiveUseCase.listHivesByOwner(ownerId, pageable);
+
+        Page<HiveResponse> response = page.map(hive -> HiveResponse.builder()
+                .id(hive.getId())
+                .name(hive.getName())
+                .location(hive.getLocation())
+                .apiKey(hive.getApiKey())
+                .hiveStatus(hive.getHiveStatus())
+                .ownerId(hive.getOwner().getId())
+                .build()
+        );
+
+        return ResponseEntity.ok(response);
+    }
 }

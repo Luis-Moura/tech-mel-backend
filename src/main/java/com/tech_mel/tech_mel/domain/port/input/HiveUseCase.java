@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface HiveUseCase {
     Hive createHive(CreateHiveRequest request);
 
-    Page<Hive> listHivesByOwner(UUID owner, Pageable pageable);
+    Page<Hive> listHivesByOwner(UUID ownerId, Pageable pageable);
 
     Optional<Hive> getHiveById(UUID hiveId);
 

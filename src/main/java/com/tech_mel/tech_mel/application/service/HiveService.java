@@ -1,6 +1,7 @@
 package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.BadRequestException;
+import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.HiveUseCase;
@@ -28,7 +29,7 @@ public class HiveService implements HiveUseCase {
     @Transactional
     public Hive createHive(CreateHiveRequest request) {
         User owner = userRepositoryPort.findById(request.ownerId())
-                .orElseThrow(() -> new BadRequestException("Usuário dono da colmeia não encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuário dono da colmeia não encontrado"));
 
         if (owner.getAvailableHives() <= 0) {
             throw new BadRequestException("Usuário não possui colmeias disponíveis.");
@@ -51,8 +52,14 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
-    public Page<Hive> listHivesByOwner(UUID owner, Pageable pageable) {
-        return hiveRepositoryPort.findByOwnerId(owner, pageable);
+    public Page<Hive> listHivesByOwner(UUID ownerId, Pageable pageable) {
+        Optional<User> user = userRepositoryPort.findById(ownerId);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("Usuário não encontrado");
+        }
+
+        return hiveRepositoryPort.findByOwnerId(ownerId, pageable);
     }
 
     @Override
