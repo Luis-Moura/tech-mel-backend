@@ -1,6 +1,7 @@
 package com.tech_mel.tech_mel.domain.port.input;
 
 import com.tech_mel.tech_mel.domain.model.Hive;
+import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.hive.CreateHiveRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,8 @@ public interface HiveUseCase {
     Page<Hive> listHivesByOwner(UUID ownerId, Pageable pageable);
 
     Page<Hive> listAllHives(Pageable pageable);
+
+    Page<User> listAllUsersWithAvailableHives(Pageable pageable);
 
     Hive getHiveById(UUID hiveId, UUID ownerId);
 

@@ -48,13 +48,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public Page<User> findAllWithAvailableHives(Pageable pageable) {
-        Page<User> userPage = userJpaRepository.findByAvailableHivesGreaterThan(0, pageable)
+        return userJpaRepository.findByAvailableHivesGreaterThan(0, pageable)
                 .map(userMapper::toDomain);
-
-        if (userPage.isEmpty()) {
-            throw new NotFoundException("Nenhum usuário encontrado");
-        }
-
-        return userPage;
     }
 }
