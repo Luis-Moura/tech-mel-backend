@@ -76,13 +76,24 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
+    @Transactional
     public void updateApiKey(UUID hiveId, String newApiKey) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
 
+        hive.setApiKey(newApiKey);
+
+        hiveRepositoryPort.save(hive);
     }
 
     @Override
     public void updateHiveStatus(UUID hiveId, Hive.HiveStatus hiveStatus) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
 
+        hive.setHiveStatus(hiveStatus);
+
+        hiveRepositoryPort.save(hive);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.tech_mel.tech_mel.infrastructure.api.controller;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.port.input.HiveUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.hive.CreateHiveRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.hive.UpdateApiKeyRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.hive.UpdateHiveStatusRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.hive.GetMyHivesResponse;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.hive.HiveResponse;
 import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
@@ -60,6 +62,7 @@ public class HiveController {
     }
 
     @GetMapping("/technician/users/{ownerId}/hives")
+    @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
     public ResponseEntity<Page<HiveResponse>> getHivesByOwner(@PathVariable UUID ownerId, Pageable pageable) {
         Page<Hive> page = hiveUseCase.listHivesByOwner(ownerId, pageable);
 
@@ -91,5 +94,27 @@ public class HiveController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/technician/api-key/{hiveId}")
+    @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
+    public ResponseEntity<Void> updateApiKey(
+            @PathVariable UUID hiveId,
+            @Valid @RequestBody UpdateApiKeyRequest request
+    ) {
+        hiveUseCase.updateApiKey(hiveId, request.apiKey().toString());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/technician/hive-status/{hiveId}")
+    @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
+    public ResponseEntity<Void> updateHiveStatus(
+            @PathVariable UUID hiveId,
+            @Valid @RequestBody UpdateHiveStatusRequest request
+    ) {
+        hiveUseCase.updateHiveStatus(hiveId, request.hiveStatus());
+
+        return ResponseEntity.noContent().build();
     }
 }
