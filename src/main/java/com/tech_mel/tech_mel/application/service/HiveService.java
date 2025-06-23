@@ -87,6 +87,7 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
+    @Transactional
     public void updateHiveStatus(UUID hiveId, Hive.HiveStatus hiveStatus) {
         Hive hive = hiveRepositoryPort.findById(hiveId)
                 .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
@@ -97,9 +98,14 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
+    @Transactional
     public void deleteHive(UUID hiveId) {
         Hive hive = hiveRepositoryPort.findById(hiveId)
                 .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
+
+        User owner = hive.getOwner();
+        owner.setAvailableHives(owner.getAvailableHives() + 1);
+        userRepositoryPort.save(owner);
 
         hiveRepositoryPort.deleteById(hive.getId());
     }
