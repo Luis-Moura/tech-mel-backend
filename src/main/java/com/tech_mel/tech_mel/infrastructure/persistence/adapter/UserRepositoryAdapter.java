@@ -1,11 +1,14 @@
 package com.tech_mel.tech_mel.infrastructure.persistence.adapter;
 
+import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.UserEntity;
 import com.tech_mel.tech_mel.infrastructure.persistence.mapper.UserMapper;
 import com.tech_mel.tech_mel.infrastructure.persistence.repository.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -41,5 +44,17 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     public Optional<User> findByVerificationToken(String token) {
         return userJpaRepository.findByVerificationToken(token)
                 .map(userMapper::toDomain);
+    }
+
+    @Override
+    public Page<User> findAllWithAvailableHives(Pageable pageable) {
+        Page<User> userPage = userJpaRepository.findByAvailableHivesGreaterThan(0, pageable)
+                .map(userMapper::toDomain);
+
+        if (userPage.isEmpty()) {
+            throw new NotFoundException("Nenhum usuário encontrado");
+        }
+
+        return userPage;
     }
 }
