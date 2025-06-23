@@ -39,6 +39,13 @@ public class HiveRepositoryAdapter implements HiveRepositoryPort {
     }
 
     @Override
+    public Page<Hive> findAllHives(Pageable pageable) {
+        Page<HiveEntity> hiveEntityPage = repository.findAll(pageable);
+
+        return hiveEntityPage.map(hiveMapper::toDomain);
+    }
+
+    @Override
     public void deleteById(UUID hiveId) {
         repository.deleteById(hiveId);
     }

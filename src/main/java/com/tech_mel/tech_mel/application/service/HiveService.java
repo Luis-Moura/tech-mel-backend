@@ -64,6 +64,17 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
+    public Page<Hive> listAllHives(Pageable pageable) {
+        Page<Hive> hives = hiveRepositoryPort.findAllHives(pageable);
+
+        if (hives.isEmpty()) {
+            throw new NotFoundException("Nenhuma hive encontrada");
+        }
+
+        return hives;
+    }
+
+    @Override
     public Hive getHiveById(UUID hiveId, UUID ownerId) {
         Hive hive = hiveRepositoryPort.findById(hiveId)
                 .orElseThrow(() -> new NotFoundException("Hive não encontrada"));

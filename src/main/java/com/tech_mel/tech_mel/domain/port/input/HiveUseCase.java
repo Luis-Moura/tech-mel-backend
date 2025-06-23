@@ -12,6 +12,8 @@ public interface HiveUseCase {
 
     Page<Hive> listHivesByOwner(UUID ownerId, Pageable pageable);
 
+    Page<Hive> listAllHives(Pageable pageable);
+
     Hive getHiveById(UUID hiveId, UUID ownerId);
 
     void updateApiKey(UUID hiveId, String newApiKey);
