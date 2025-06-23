@@ -41,7 +41,7 @@ public class HiveController {
         return ResponseEntity.status(HttpStatus.CREATED).body(hiveResponse);
     }
 
-    @GetMapping("/hives")
+    @GetMapping("/my/hives")
     public ResponseEntity<Page<GetMyHivesResponse>> getMyhives(Pageable pageable) {
         UUID userId = authenticationUtil.getCurrentUserId();
 
@@ -59,7 +59,7 @@ public class HiveController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/technician/hives/{ownerId}")
+    @GetMapping("/technician/users/{ownerId}/hives")
     public ResponseEntity<Page<HiveResponse>> getHivesByOwner(@PathVariable UUID ownerId, Pageable pageable) {
         Page<Hive> page = hiveUseCase.listHivesByOwner(ownerId, pageable);
 
@@ -72,6 +72,23 @@ public class HiveController {
                 .ownerId(hive.getOwner().getId())
                 .build()
         );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/my/hives/{hiveId}")
+    public ResponseEntity<GetMyHivesResponse> getMyHiveById(@PathVariable UUID hiveId) {
+        UUID ownerId = authenticationUtil.getCurrentUserId();
+
+        Hive hive = hiveUseCase.getHiveById(hiveId, ownerId);
+
+        GetMyHivesResponse response = GetMyHivesResponse.builder()
+                .id(hive.getId())
+                .name(hive.getName())
+                .location(hive.getLocation())
+                .hiveStatus(hive.getHiveStatus())
+                .ownerId(hive.getOwner().getId())
+                .build();
 
         return ResponseEntity.ok(response);
     }

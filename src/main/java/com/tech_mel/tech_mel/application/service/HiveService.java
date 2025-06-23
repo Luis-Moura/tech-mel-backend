@@ -1,6 +1,7 @@
 package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.BadRequestException;
+import com.tech_mel.tech_mel.application.exception.ForbiddenException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.User;
@@ -63,8 +64,15 @@ public class HiveService implements HiveUseCase {
     }
 
     @Override
-    public Optional<Hive> getHiveById(UUID hiveId) {
-        return Optional.empty();
+    public Hive getHiveById(UUID hiveId, UUID ownerId) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
+
+        if (!hive.getOwner().getId().equals(ownerId)) {
+            throw new ForbiddenException("Você não tem permissão para acessar esta colmeia.");
+        }
+
+        return hive;
     }
 
     @Override
