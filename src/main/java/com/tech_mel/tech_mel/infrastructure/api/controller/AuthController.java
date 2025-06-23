@@ -73,7 +73,7 @@ public class AuthController {
             )
         ),
         @ApiResponse(
-            responseCode = "401", 
+            responseCode = "401",
             description = "Credenciais inválidas ou email não verificado",
             content = @Content(
                 mediaType = "application/json",
@@ -124,10 +124,10 @@ public class AuthController {
                     {
                         "timestamp": "2024-01-01T10:00:00",
                         "status": 404,
-                        "error": "Not Found", 
+                        "error": "Not Found",\s
                         "message": "Credenciais inválidas"
                     }
-                    """
+                   \s"""
                 )
             )
         ),
