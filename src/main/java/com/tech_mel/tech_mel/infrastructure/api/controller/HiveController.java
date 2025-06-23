@@ -117,4 +117,12 @@ public class HiveController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("technician/hives/{hiveId}")
+    @PreAuthorize("hasAuthority('ROLE_TECHNICIAN')")
+    public ResponseEntity<Void> deleteHiveById(@PathVariable UUID hiveId) {
+        hiveUseCase.deleteHive(hiveId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

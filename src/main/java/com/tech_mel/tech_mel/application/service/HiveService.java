@@ -98,6 +98,9 @@ public class HiveService implements HiveUseCase {
 
     @Override
     public void deleteHive(UUID hiveId) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .orElseThrow(() -> new NotFoundException("Hive não encontrada"));
 
+        hiveRepositoryPort.deleteById(hive.getId());
     }
 }
