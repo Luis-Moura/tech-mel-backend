@@ -3,6 +3,7 @@ package com.tech_mel.tech_mel.application.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +44,7 @@ public class AuthService implements AuthUseCase {
     @Override
     public String authenticateUser(String email, String password) {
         try {
-            User user = userRepositoryPort.findByEmail(email)
+            User user = userRepositoryPort.findByEmail(email.toLowerCase(Locale.ROOT))
                     .orElseThrow(() -> new NotFoundException("Credenciais inválidas"));
 
             if (user.getAuthProvider() != User.AuthProvider.LOCAL) {
@@ -87,7 +88,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public void registerUser(String email, String password, String name) {
-        User existingUser = userRepositoryPort.findByEmail(email)
+        User existingUser = userRepositoryPort.findByEmail(email.toLowerCase(Locale.ROOT))
                 .orElse(null);
 
         if (existingUser != null) {
@@ -109,7 +110,7 @@ public class AuthService implements AuthUseCase {
         }
 
         User user = User.builder()
-                .email(email)
+                .email(email.toLowerCase(Locale.ROOT))
                 .password(passwordEncoder.encode(password))
                 .authProvider(User.AuthProvider.LOCAL)
                 .name(name)
@@ -129,7 +130,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public void resendVerificationEmail(String email) {
-        User user = userRepositoryPort.findByEmail(email)
+        User user = userRepositoryPort.findByEmail(email.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
 
         if (user.isEmailVerified()) {
@@ -196,7 +197,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public void requestPasswordReset(String email) {
-        User user = userRepositoryPort.findByEmail(email)
+        User user = userRepositoryPort.findByEmail(email.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
 
         if (user.getAuthProvider() == User.AuthProvider.GOOGLE) {
@@ -250,7 +251,7 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public User findUserByEmail(String email) {
-        return userRepositoryPort.findByEmail(email)
+        return userRepositoryPort.findByEmail(email.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado com o email: " + email));
     }
 
