@@ -33,6 +33,7 @@ public class HiveService implements HiveUseCase {
                 .orElseThrow(() -> new NotFoundException("Usuário dono da colmeia não encontrado"));
 
         if (owner.getAvailableHives() <= 0) {
+            log.warn("Tentativa de criação de hive em usuário que não possui hives disponíveis");
             throw new BadRequestException("Usuário não possui colmeias disponíveis.");
         }
 
@@ -48,6 +49,8 @@ public class HiveService implements HiveUseCase {
 
         owner.setAvailableHives(owner.getAvailableHives() - 1);
         userRepositoryPort.save(owner);
+
+        log.info("Hive criada para o usuário: {}", owner.getId());
 
         return savedHive;
     }
@@ -106,6 +109,8 @@ public class HiveService implements HiveUseCase {
         hive.setApiKey(newApiKey);
 
         hiveRepositoryPort.save(hive);
+
+        log.info("Chave de api da hive {} mudada para {}", hive.getId(), hive.getApiKey());
     }
 
     @Override
@@ -117,6 +122,8 @@ public class HiveService implements HiveUseCase {
         hive.setHiveStatus(hiveStatus);
 
         hiveRepositoryPort.save(hive);
+
+        log.info("Status de atividade da hive {} mudada para {}", hive.getId(), hive.getHiveStatus());
     }
 
     @Override
@@ -130,5 +137,7 @@ public class HiveService implements HiveUseCase {
         userRepositoryPort.save(owner);
 
         hiveRepositoryPort.deleteById(hive.getId());
+
+        log.info("hive {} deletada", hiveId);
     }
 }
