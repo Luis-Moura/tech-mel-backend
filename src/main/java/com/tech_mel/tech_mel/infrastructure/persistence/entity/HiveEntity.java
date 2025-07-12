@@ -34,7 +34,7 @@ public class HiveEntity {
     @Column(nullable = false)
     private String location;
 
-    @Column(nullable = false, name = "api_key")
+    @Column(nullable = false, unique = true, name = "api_key")
     private String apiKey;
 
     @Column(nullable = false, name = "hive_status")
