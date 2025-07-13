@@ -12,6 +12,8 @@ public interface HiveRepositoryPort {
 
     Optional<Hive> findById(UUID hiveId);
 
+    Optional<Hive> findByApiKey(String apiKey);
+
     Page<Hive> findByOwnerId(UUID ownerId, Pageable pageable);
 
     Page<Hive> findAllHives(Pageable pageable);

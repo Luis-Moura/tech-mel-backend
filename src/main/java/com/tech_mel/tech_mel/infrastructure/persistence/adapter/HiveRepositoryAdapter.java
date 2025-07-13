@@ -33,6 +33,12 @@ public class HiveRepositoryAdapter implements HiveRepositoryPort {
     }
 
     @Override
+    public Optional<Hive> findByApiKey(String apiKey) {
+        return repository.findByApiKey(apiKey)
+                .map(hiveMapper::toDomain);
+    }
+
+    @Override
     public Page<Hive> findByOwnerId(UUID ownerId, Pageable pageable) {
         Page<HiveEntity> hiveEntityPage = repository.findByOwner_Id(ownerId, pageable);
         return hiveEntityPage.map(hiveMapper::toDomain);
