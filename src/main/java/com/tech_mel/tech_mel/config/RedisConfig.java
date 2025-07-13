@@ -8,8 +8,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.util.UUID;
-
 @Configuration
 public class RedisConfig {
 
@@ -18,21 +16,8 @@ public class RedisConfig {
     public RedisTemplate<String, String> accessTokenRedisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
-
-        // Serializa chave e valor como String
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
-
-        return template;
-    }
-
-    @Bean
-    public RedisTemplate<String, UUID> uuidRedisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, UUID> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-        template.afterPropertiesSet();
         return template;
     }
 
