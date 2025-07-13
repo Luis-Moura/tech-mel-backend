@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.tech_mel.tech_mel.application.exception.UnauthorizedException;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.output.JwtPort;
+import com.tech_mel.tech_mel.domain.port.output.TokenBlacklistPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtPort jwtServicePort;
     private final UserRepositoryPort userRepositoryPort;
+    private final TokenBlacklistPort tokenBlacklistPort;
 
     @Override
     protected void doFilterInternal(
@@ -43,6 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt = authHeader.substring(7);
 
         try {
+            // Verificar se o token está na blacklist
+            if (tokenBlacklistPort.isBlacklisted(jwt)) {
+                log.warn("Token JWT está na blacklist");
+                throw new UnauthorizedException("Token inválido ou expirado");
+            }
+
             String username = jwtServicePort.extractUsername(jwt);
             User user = userRepositoryPort.findByEmail(username)
                     .orElseThrow(() -> new UnauthorizedException("Usuário não encontrado"));

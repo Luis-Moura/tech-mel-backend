@@ -2,12 +2,13 @@ package com.tech_mel.tech_mel.infrastructure.api.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.data.redis.core.RedisTemplate;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.tech_mel.tech_mel.domain.port.output.OAuth2StatePort;
 import com.tech_mel.tech_mel.infrastructure.security.oauth2.TokenPair;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "OAuth2", description = "Endpoints para autenticação OAuth2 com Google")
 public class OAuth2Controller {
 
-    private final RedisTemplate<String, Object> objectRedisTemplate;
+    private final OAuth2StatePort oAuth2StatePort;
 
     @GetMapping("/exchange-token")
     @Operation(
@@ -86,15 +87,15 @@ public class OAuth2Controller {
         @Parameter(description = "State temporário gerado durante o processo de autenticação OAuth2", required = true)
         @RequestParam String state
     ) {
-        String redisKey = "oauth2:state:" + state;
-        TokenPair tokenPair = (TokenPair) objectRedisTemplate.opsForValue().get(redisKey);
+        UUID stateId = UUID.fromString(state);
+        TokenPair tokenPair = (TokenPair) oAuth2StatePort.getTokenPair(stateId).orElse(null);
 
         if (tokenPair == null) {
             return ResponseEntity.notFound().build();
         }
 
         // Remover o token temporário após uso
-        objectRedisTemplate.delete(redisKey);
+        oAuth2StatePort.deleteState(stateId);
 
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", tokenPair.getAccessToken());

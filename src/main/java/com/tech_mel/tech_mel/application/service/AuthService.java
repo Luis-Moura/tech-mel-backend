@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.tech_mel.tech_mel.application.exception.ConflictException;
@@ -21,6 +21,8 @@ import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.input.AuthUseCase;
 import com.tech_mel.tech_mel.domain.port.input.RefreshTokenUseCase;
 import com.tech_mel.tech_mel.domain.port.output.JwtPort;
+import com.tech_mel.tech_mel.domain.port.output.PasswordResetCachePort;
+import com.tech_mel.tech_mel.domain.port.output.TokenBlacklistPort;
 import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +39,8 @@ public class AuthService implements AuthUseCase {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
     private final RefreshTokenUseCase refreshTokenUseCase;
-    private final RedisTemplate<String, String> redisTemplate;
-
+    private final PasswordResetCachePort passwordResetCachePort;
+    private final TokenBlacklistPort tokenBlacklistPort;
     private final JwtPort jwtPort;
 
     @Override
@@ -190,7 +192,7 @@ public class AuthService implements AuthUseCase {
         User user = userRepositoryPort.findByEmail(userEmail)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        jwtPort.addToBlacklist(token);
+        tokenBlacklistPort.addToBlacklist(token);
         refreshTokenUseCase.revokeAllUserTokens(user);
         log.info("Logout realizado para: {}", userEmail);
     }
@@ -206,10 +208,7 @@ public class AuthService implements AuthUseCase {
         }
 
         UUID resetToken = UUID.randomUUID();
-        String redisKey = "password-reset:" + resetToken;
-
-        // Armazenando o userId como String
-        redisTemplate.opsForValue().set(redisKey, user.getId().toString(), Duration.ofMinutes(15));
+        passwordResetCachePort.storeResetToken(resetToken, user.getId(), Duration.ofMinutes(15));
 
         eventPublisher.publishEvent(new PasswordResetEvent(user.getEmail(), user.getName(), resetToken));
         log.info("Solicitação de reset de senha para: {}", email);
@@ -217,23 +216,14 @@ public class AuthService implements AuthUseCase {
 
     @Override
     public void resetPassword(UUID token, String newPassword) {
-        String redisKey = "password-reset:" + token.toString();
-        String userIdStr = redisTemplate.opsForValue().get(redisKey);
+        Optional<UUID> userIdOpt = passwordResetCachePort.getUserIdByToken(token);
 
-        if (userIdStr == null) {
+        if (userIdOpt.isEmpty()) {
             log.warn("Token de redefinição de senha inválido ou expirado: {}", token);
             throw new UnauthorizedException("Token de redefinição de senha inválido ou expirado");
         }
 
-        UUID userId;
-
-        try {
-            userId = UUID.fromString(userIdStr);
-        } catch (IllegalArgumentException e) {
-            log.error("Token de redefinição de senha mal formatado: {}", token);
-            throw new UnauthorizedException("Token de redefinição de senha inválido");
-        }
-
+        UUID userId = userIdOpt.get();
         User user = userRepositoryPort.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
@@ -245,7 +235,7 @@ public class AuthService implements AuthUseCase {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepositoryPort.save(user);
 
-        redisTemplate.delete(redisKey);
+        passwordResetCachePort.deleteResetToken(token);
         log.info("Senha redefinida com sucesso para: {}", user.getEmail());
     }
 
