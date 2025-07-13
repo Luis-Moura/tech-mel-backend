@@ -40,7 +40,7 @@ public class RedisTokenBlacklistAdapter implements TokenBlacklistPort {
 
     @Override
     public boolean isBlacklisted(String token) {
-        return Boolean.TRUE.equals(accessTokenRedisTemplate.hasKey("blacklist:" + token));
+        return accessTokenRedisTemplate.hasKey("blacklist:" + token);
     }
 
     private Date extractExpiration(String token) {
