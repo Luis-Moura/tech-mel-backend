@@ -17,6 +17,7 @@ import java.util.UUID;
 @Builder
 public class DailyMeasurementAverageEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false)
