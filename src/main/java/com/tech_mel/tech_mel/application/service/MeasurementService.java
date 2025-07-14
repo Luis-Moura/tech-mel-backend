@@ -48,4 +48,9 @@ public class MeasurementService implements MeasurementUseCase {
 
         return measurement;
     }
+
+    @Override
+    public Measurement getLastMeasurement(String apiKey) {
+        return null;
+    }
 }

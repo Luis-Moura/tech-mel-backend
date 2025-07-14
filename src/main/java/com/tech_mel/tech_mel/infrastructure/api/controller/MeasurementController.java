@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(
         name = "Measurements",
-        description = "Endpoints para comunicação com dispositivos IoT das colmeias e para CRUD de medições"
+        description = "Endpoints para comunicação com dispositivos IoT das colmeias e para opreções de medições"
 )
 public class MeasurementController {
     private final MeasurementUseCase measurementUseCase;
