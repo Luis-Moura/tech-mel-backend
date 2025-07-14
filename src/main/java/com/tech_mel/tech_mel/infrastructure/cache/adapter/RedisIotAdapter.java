@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class RedisIotAdapter implements RedisIotPort {
-    private final RedisTemplate<String, Object> objectRedisTemplate;
+    private final RedisTemplate<String, Object> iotRedisTemplate;
     
     private static final String MEASUREMENT_KEY_PREFIX = "measurements:";
     private static final long DEFAULT_TTL_HOURS = 24; // TTL de 24 horas para as medições
@@ -21,15 +21,15 @@ public class RedisIotAdapter implements RedisIotPort {
         String key = MEASUREMENT_KEY_PREFIX + apiKey;
 
         // Define TTL para a chave se ela não existir
-        if (!objectRedisTemplate.hasKey(key)) {
-            objectRedisTemplate.expire(key, java.time.Duration.ofHours(DEFAULT_TTL_HOURS));
+        if (!iotRedisTemplate.hasKey(key)) {
+            iotRedisTemplate.expire(key, java.time.Duration.ofHours(DEFAULT_TTL_HOURS));
         }
         
         // Adiciona a medição no início da lista (mais recente primeiro)
-        objectRedisTemplate.opsForList().leftPush(key, measurement);
+        iotRedisTemplate.opsForList().leftPush(key, measurement);
 
         // Mantém apenas as últimas 1000 medições para evitar crescimento excessivo
-        objectRedisTemplate.opsForList().trim(key, 0, 999);
+        iotRedisTemplate.opsForList().trim(key, 0, 999);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class RedisIotAdapter implements RedisIotPort {
         String key = MEASUREMENT_KEY_PREFIX + apiKey;
         
         // Busca as medições mais recentes (limitadas pelo parâmetro)
-        List<Object> measurements = objectRedisTemplate.opsForList().range(key, 0, limit - 1);
+        List<Object> measurements = iotRedisTemplate.opsForList().range(key, 0, limit - 1);
         
         if (measurements == null) {
             return List.of();
@@ -54,7 +54,7 @@ public class RedisIotAdapter implements RedisIotPort {
         String key = MEASUREMENT_KEY_PREFIX + apiKey;
         
         // Busca a primeira medição da lista (mais recente)
-        Object latestMeasurement = objectRedisTemplate.opsForList().index(key, 0);
+        Object latestMeasurement = iotRedisTemplate.opsForList().index(key, 0);
         
         return latestMeasurement != null ? (Measurement) latestMeasurement : null;
     }
@@ -62,6 +62,6 @@ public class RedisIotAdapter implements RedisIotPort {
     @Override
     public void clearMeasurements(String apiKey) {
         String key = MEASUREMENT_KEY_PREFIX + apiKey;
-        objectRedisTemplate.delete(key);
+        iotRedisTemplate.delete(key);
     }
 }
