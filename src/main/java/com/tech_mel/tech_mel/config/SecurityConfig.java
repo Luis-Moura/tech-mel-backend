@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/logout").authenticated()
                         .requestMatchers("/oauth2/**").permitAll()
                         .requestMatchers("/login/oauth2/code/**").permitAll()
-                        .requestMatchers("/api/iot/measurements").permitAll()
+                        .requestMatchers("/api/measurements/iot").permitAll()
                         .requestMatchers("/api/technician/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TECHNICIAN")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()

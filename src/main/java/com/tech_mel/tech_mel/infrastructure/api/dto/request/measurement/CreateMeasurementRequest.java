@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.infrastructure.api.dto.request.iot;
+package com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement;
 
 import java.time.LocalDateTime;
 import org.jetbrains.annotations.NotNull;

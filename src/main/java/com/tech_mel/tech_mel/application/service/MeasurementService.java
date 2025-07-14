@@ -4,10 +4,10 @@ import com.tech_mel.tech_mel.application.exception.ConflictException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.Measurement;
-import com.tech_mel.tech_mel.domain.port.input.IotUseCase;
+import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
 import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
 import com.tech_mel.tech_mel.domain.port.output.RedisIotPort;
-import com.tech_mel.tech_mel.infrastructure.api.dto.request.iot.CreateMeasurementRequest;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IotService implements IotUseCase {
+public class MeasurementService implements MeasurementUseCase {
     private final HiveRepositoryPort hiveRepositoryPort;
     private final RedisIotPort redisIotPort;
 

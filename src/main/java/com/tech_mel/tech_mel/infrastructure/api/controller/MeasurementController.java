@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.tech_mel.tech_mel.domain.model.Measurement;
-import com.tech_mel.tech_mel.domain.port.input.IotUseCase;
-import com.tech_mel.tech_mel.infrastructure.api.dto.request.iot.CreateMeasurementRequest;
+import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
+import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.iot.CreateMeasurementResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,13 +23,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/iot/measurements")
+@RequestMapping("/api/measurements")
 @RequiredArgsConstructor
-@Tag(name = "IoT", description = "Endpoints para comunicação com dispositivos IoT das colmeias")
-public class IotController {
-    private final IotUseCase iotUseCase;
+@Tag(
+        name = "Measurements",
+        description = "Endpoints para comunicação com dispositivos IoT das colmeias e para CRUD de medições"
+)
+public class MeasurementController {
+    private final MeasurementUseCase measurementUseCase;
 
-    @PostMapping()
+    @PostMapping("/iot")
     @Operation(
             summary = "Registra medições dos sensores",
             description = "Endpoint para dispositivos IoT enviarem dados de sensores das colmeias (temperatura, umidade e CO2)",
@@ -79,7 +82,7 @@ public class IotController {
             )
             @Valid @RequestBody CreateMeasurementRequest request
     ) {
-        Measurement measurement = iotUseCase.registerMeasurement(apiKey, request);
+        Measurement measurement = measurementUseCase.registerMeasurement(apiKey, request);
 
         CreateMeasurementResponse response = CreateMeasurementResponse.builder()
                 .temperature(measurement.getTemperature())
