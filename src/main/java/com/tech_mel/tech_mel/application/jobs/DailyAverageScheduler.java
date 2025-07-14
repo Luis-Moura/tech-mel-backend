@@ -26,7 +26,7 @@ public class DailyAverageScheduler {
     private final RedisIotPort redisIotPort;
     private final DailyMeasurementAverageRepositoryPort dailyMeasurementAverageRepositoryPort;
 
-    @Scheduled(cron = "0 32 9 * * *") //todo dia meia noite
+    @Scheduled(cron = "0 1 0 * * *") //todos os dias à meia noite
     public void processDailyAverages() {
         log.info("Starting daily average processing...");
 
