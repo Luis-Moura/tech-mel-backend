@@ -10,8 +10,12 @@ import com.tech_mel.tech_mel.domain.port.output.RedisIotPort;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -50,7 +54,41 @@ public class MeasurementService implements MeasurementUseCase {
     }
 
     @Override
-    public Measurement getLastMeasurement(String apiKey) {
-        return null;
+    public Measurement getLatestMeasurementByApiKey(UUID userId, UUID hiveId) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .filter(h -> h.getOwner().getId().equals(userId))
+                .orElseThrow(() -> new NotFoundException("Hive not found"));
+
+        Measurement lastestMeasurement = redisIotPort.getLatestMeasurement(hive.getApiKey());
+
+        if (lastestMeasurement == null) {
+            log.warn("No measurements found for hive: {}", hive.getId());
+            throw new NotFoundException("No measurements found for the given hive.");
+        }
+
+        return lastestMeasurement;
+    }
+
+    @Override
+    public Map<String, Measurement> getLatestMeasurementsGroupedByHive(UUID userId) {
+        List<Hive> hives = hiveRepositoryPort.findByOwnerId(userId, Pageable.unpaged())
+                .getContent();
+
+        if (hives.isEmpty()) {
+            log.warn("No hives found for user: {}", userId);
+            throw new NotFoundException("No hives found for the given user.");
+        }
+
+        List<String> apiKeys = hives.stream()
+                .map(Hive::getApiKey)
+                .filter(Objects::nonNull)
+                .toList();
+
+        if (apiKeys.isEmpty()) {
+            log.warn("No API keys found for user: {}", userId);
+            throw new NotFoundException("No API keys found for the given user.");
+        }
+
+        return redisIotPort.getLatestMeasurementsForMultipleHives(apiKeys);
     }
 }
