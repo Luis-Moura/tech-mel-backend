@@ -1,15 +1,17 @@
 package com.tech_mel.tech_mel.infrastructure.cache.adapter;
 
-import java.util.List;
-import java.util.Objects;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 import com.tech_mel.tech_mel.domain.model.Measurement;
 import com.tech_mel.tech_mel.domain.port.output.RedisIotPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -50,18 +52,27 @@ public class RedisIotAdapter implements RedisIotPort {
 
         return rawMeasurements.stream()
                 .filter(Objects::nonNull)
-                .map(obj -> objectMapper.convertValue(obj, Measurement.class)) // 👈 aqui é a mágica
+                .map(obj -> objectMapper.convertValue(obj, Measurement.class))
                 .toList();
+    }
+
+    @Override
+    public Map<String, Measurement> getLatestMeasurementsForMultipleHives(List<String> apiKeys) {
+        return apiKeys.stream()
+                .map(apiKey -> Map.entry(apiKey, getLatestMeasurement(apiKey)))
+                .filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public Measurement getLatestMeasurement(String apiKey) {
         String key = MEASUREMENT_KEY_PREFIX + apiKey;
 
-        // Busca a primeira medição da lista (mais recente)
         Object latestMeasurement = iotRedisTemplate.opsForList().index(key, 0);
 
-        return latestMeasurement != null ? (Measurement) latestMeasurement : null;
+        return latestMeasurement != null
+                ? objectMapper.convertValue(latestMeasurement, Measurement.class)
+                : null;
     }
 
     @Override
