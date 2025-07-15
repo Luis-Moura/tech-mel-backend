@@ -2,14 +2,17 @@ package com.tech_mel.tech_mel.application.service;
 
 import com.tech_mel.tech_mel.application.exception.ConflictException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
+import com.tech_mel.tech_mel.domain.model.DailyMeasurementAverage;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.Measurement;
 import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
+import com.tech_mel.tech_mel.domain.port.output.DailyMeasurementAverageRepositoryPort;
 import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
 import com.tech_mel.tech_mel.domain.port.output.RedisIotPort;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ import java.util.UUID;
 @Slf4j
 public class MeasurementService implements MeasurementUseCase {
     private final HiveRepositoryPort hiveRepositoryPort;
+    private final DailyMeasurementAverageRepositoryPort dailyMeasurementAverageRepositoryPort;
     private final RedisIotPort redisIotPort;
 
     @Override
@@ -90,5 +94,30 @@ public class MeasurementService implements MeasurementUseCase {
         }
 
         return redisIotPort.getLatestMeasurementsForMultipleHives(apiKeys);
+    }
+
+    @Override
+    public Page<DailyMeasurementAverage> getDailyMeasurementAverages(
+            UUID userId,
+            UUID hived,
+            Pageable pageable
+    ) {
+        Hive hive = hiveRepositoryPort.findById(hived)
+                .orElseThrow(() -> new NotFoundException("Hive not found"));
+
+        if (hive.getOwner().getId() != userId) {
+            log.warn("User {} does not own hive: {}", userId, hive.getId());
+            throw new NotFoundException("Hive not found for the given user.");
+        }
+
+        Page<DailyMeasurementAverage> dailyAverages = dailyMeasurementAverageRepositoryPort
+                .findAllByHiveId(hive.getId(), pageable);
+
+        if (dailyAverages.isEmpty()) {
+            log.warn("No daily measurement averages found for hive: {}", hive.getId());
+            throw new NotFoundException("No daily measurement averages found for the given hive.");
+        }
+
+        return dailyAverages;
     }
 }
