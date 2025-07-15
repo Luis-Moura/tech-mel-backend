@@ -1,4 +1,4 @@
-package com.tech_mel.tech_mel.infrastructure.api.dto.response.iot;
+package com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
