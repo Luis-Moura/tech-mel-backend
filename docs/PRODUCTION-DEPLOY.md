@@ -19,7 +19,7 @@
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Render        │    │   Docker Hub    │    │   Render        │
+│   Render        │    │   Docker Hub    │    │   Neon          │
 │   Web Service   │◄──►│   Registry      │    │   PostgreSQL    │
 │                 │    │                 │    │                 │
 │ • Aplicação     │    │ • Imagem Docker │    │ • Banco Managed │
@@ -38,7 +38,7 @@
 ### Stack de Produção
 
 - **Aplicação**: Render Web Service
-- **Banco de Dados**: Render PostgreSQL (Managed)
+- **Banco de Dados**: Neon PostgreSQL (Managed)
 - **Cache**: Upstash Redis ou Render Redis
 - **Container Registry**: Docker Hub
 - **SSL**: Automático via Render

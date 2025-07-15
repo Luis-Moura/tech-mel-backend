@@ -203,7 +203,7 @@ Herdam todas as permissões de TECHNICIAN, podendo gerenciar todo o sistema.
 
 **Processo atual (manual - TEMPORÁRIO)**:
 1. Usuário solicita compra de colmeias (processo externo - EM DESENVOLVIMENTO)
-2. Admin/Sistema incrementa campo `available_hives` via SQL (ARTIFÍCIO TEMPORÁRIO)
+2. Sistema incrementa campo `available_hives` via SQL (ARTIFÍCIO TEMPORÁRIO)
 3. Usuário pode verificar suas colmeias disponíveis no dashboard
 
 > 🚧 **Em Desenvolvimento**: O sistema completo de compras incluirá integração com gateway de pagamento, notificações automáticas e dashboard administrativo.
