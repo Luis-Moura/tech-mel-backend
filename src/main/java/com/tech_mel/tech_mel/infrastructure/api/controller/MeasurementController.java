@@ -1,16 +1,17 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
+import com.tech_mel.tech_mel.domain.model.Hive;
+import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
+import com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement.LatestHiveMeasurementResponse;
+import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.tech_mel.tech_mel.domain.model.Measurement;
 import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
-import com.tech_mel.tech_mel.infrastructure.api.dto.response.iot.CreateMeasurementResponse;
+import com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement.CreateMeasurementResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,6 +23,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/measurements")
 @RequiredArgsConstructor
@@ -31,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 )
 public class MeasurementController {
     private final MeasurementUseCase measurementUseCase;
+    private final AuthenticationUtil authenticationUtil;
+    private final HiveRepositoryPort hiveRepositoryPort;
 
     @PostMapping("/iot")
     @Operation(
@@ -75,7 +83,7 @@ public class MeasurementController {
                     example = "hive_12345_api_key_abcdef"
             )
             @RequestHeader("X-API-Key") String apiKey,
-            
+
             @Parameter(
                     description = "Dados das medições dos sensores",
                     required = true
@@ -91,5 +99,47 @@ public class MeasurementController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/latest/{hiveId}")
+    public ResponseEntity<LatestHiveMeasurementResponse> getLatestMeasurementByHiveId(
+            @PathVariable UUID hiveId
+    ) {
+        UUID userId = authenticationUtil.getCurrentUserId();
+
+        Measurement latestMeasurement = measurementUseCase
+                .getLatestMeasurementByApiKey(userId, hiveId);
+
+        LatestHiveMeasurementResponse response = LatestHiveMeasurementResponse.builder()
+                .hiveId(hiveId)
+                .hiveName(hiveRepositoryPort.findById(hiveId)
+                        .map(Hive::getName)
+                        .orElse("Unknown Hive"))
+                .latestMeasurement(latestMeasurement)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/latests")
+    public ResponseEntity<List<LatestHiveMeasurementResponse>> getLatestMeasurements() {
+        UUID userId = authenticationUtil.getCurrentUserId();
+
+        Map<String, Measurement> latestMeasurements = measurementUseCase
+                .getLatestMeasurementsGroupedByHive(userId);
+
+        List<Hive> userHives = hiveRepositoryPort
+                .findByOwnerId(userId, Pageable.unpaged()).getContent();
+
+        List<LatestHiveMeasurementResponse> response = userHives.stream()
+                .filter(hive -> latestMeasurements.containsKey(hive.getApiKey()))
+                .map(hive -> LatestHiveMeasurementResponse.builder()
+                        .hiveId(hive.getId())
+                        .hiveName(hive.getName())
+                        .latestMeasurement(latestMeasurements.get(hive.getApiKey()))
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 }
