@@ -1,17 +1,13 @@
 package com.tech_mel.tech_mel.infrastructure.api.controller;
 
 import com.tech_mel.tech_mel.domain.model.Hive;
-import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
-import com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement.LatestHiveMeasurementResponse;
-import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.tech_mel.tech_mel.domain.model.Measurement;
 import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
+import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
 import com.tech_mel.tech_mel.infrastructure.api.dto.request.measurement.CreateMeasurementRequest;
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement.CreateMeasurementResponse;
+import com.tech_mel.tech_mel.infrastructure.api.dto.response.measurement.LatestHiveMeasurementResponse;
+import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,11 +18,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/measurements")
