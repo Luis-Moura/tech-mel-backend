@@ -36,9 +36,8 @@ public class AlertEntity {
     @Enumerated(EnumType.STRING)
     private AlertStatus status;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime timestamp;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hive_id", nullable = false)
