@@ -1,15 +1,10 @@
 package com.tech_mel.tech_mel.infrastructure.api.dto.response.alert;
 
-import com.tech_mel.tech_mel.domain.model.Alert;
-import com.tech_mel.tech_mel.domain.model.Hive;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Builder
