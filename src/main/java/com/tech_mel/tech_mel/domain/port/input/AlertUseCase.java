@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface AlertUseCase {
-    Alert saveAlert(Measurement measurement, Hive hive, LocalDateTime timestamp);
+    void saveAlert(Measurement measurement, Hive hive, LocalDateTime timestamp);
 
     Alert getAlertById(UUID alertId, UUID ownerId);
 

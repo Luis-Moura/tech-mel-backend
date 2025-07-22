@@ -31,7 +31,7 @@ public class AlertService implements AlertUseCase {
     private final HiveRepositoryPort hiveRepositoryPort;
 
     @Override
-    public Alert saveAlert(Measurement measurement, Hive hive, LocalDateTime timestamp) {
+    public void saveAlert(Measurement measurement, Hive hive, LocalDateTime timestamp) {
         Threshold threshold = thresholdRepositoryPort.findByHiveId(hive.getId())
                 .orElseThrow(() -> new NotFoundException("Threshold not configured"));
 
@@ -50,7 +50,6 @@ public class AlertService implements AlertUseCase {
         }
 
         alerts.forEach(alertRepositoryPort::save);
-        return alerts.isEmpty() ? null : alerts.get(0);
     }
 
     @Override

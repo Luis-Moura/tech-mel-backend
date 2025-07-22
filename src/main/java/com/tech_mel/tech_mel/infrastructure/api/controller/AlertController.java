@@ -106,7 +106,7 @@ public class AlertController {
     public ResponseEntity<Page<AlertResponse>> getAlertsByHiveIdAndStatus(
             @Parameter(description = "ID da colmeia", required = true)
             @PathVariable UUID hiveId,
-            @Parameter(description = "Status do alerta", required = false, example = "NEW")
+            @Parameter(description = "Status do alerta", example = "NEW")
             @RequestParam(required = false) Alert.AlertStatus status,
             Pageable pageable
     ) {
