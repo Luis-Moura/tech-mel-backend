@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "threshold")
 @Getter
@@ -14,8 +16,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor
 public class ThresholdEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "temperature_min", nullable = false)
     private Double temperatureMin;

@@ -2,7 +2,9 @@ package com.tech_mel.tech_mel.infrastructure.persistence.mapper;
 
 import com.tech_mel.tech_mel.domain.model.Alert;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.AlertEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AlertMapper {
     private final HiveMapper hiveMapper;
 
