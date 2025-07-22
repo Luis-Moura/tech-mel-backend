@@ -9,5 +9,7 @@ import java.util.UUID;
 
 public interface AlertJpaRepository extends JpaRepository<AlertEntity, UUID> {
     Page<AlertEntity> findAllByHiveIdAndStatus(UUID hiveId, AlertEntity.AlertStatus status, Pageable pageable);
+
+    Page<AlertEntity> findAllByHiveId(UUID hiveId, Pageable pageable);
 }
 

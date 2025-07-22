@@ -37,11 +37,4 @@ public class ThresholdRepositoryAdapter implements ThresholdRepositoryPort {
         return repository.findByHiveId(hiveId)
                 .map(thresholdMapper::toDomain);
     }
-
-    @Override
-    public void update(Threshold threshold) {
-        ThresholdEntity thresholdEntity = thresholdMapper.toEntity(threshold);
-
-        repository.save(thresholdEntity);
-    }
 }

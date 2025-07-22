@@ -35,6 +35,12 @@ public class AlertRepositoryAdapter implements AlertRepositoryPort {
     }
 
     @Override
+    public Page<Alert> findAllByHiveId(UUID hiveId, Pageable pageable) {
+        Page<AlertEntity> alertEntityPage = repository.findAllByHiveId(hiveId, pageable);
+        return alertEntityPage.map(alertMapper::toDomain);
+    }
+
+    @Override
     public Page<Alert> findAllByHiveIdAndStatus(
             UUID hiveId,
             Alert.AlertStatus status,

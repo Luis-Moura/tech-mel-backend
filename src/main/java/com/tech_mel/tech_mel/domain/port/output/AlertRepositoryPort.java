@@ -12,6 +12,8 @@ public interface AlertRepositoryPort {
 
     Optional<Alert> findById(UUID alertId);
 
+    Page<Alert> findAllByHiveId(UUID hiveId, Pageable pageable);
+
     Page<Alert> findAllByHiveIdAndStatus(
             UUID hiveId,
             Alert.AlertStatus status,

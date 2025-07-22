@@ -11,6 +11,4 @@ public interface ThresholdRepositoryPort {
     Optional<Threshold> findById(UUID thresholdId);
 
     Optional<Threshold> findByHiveId(UUID hiveId);
-
-    void update(Threshold threshold);
 }

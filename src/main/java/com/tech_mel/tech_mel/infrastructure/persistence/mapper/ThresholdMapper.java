@@ -16,6 +16,7 @@ public class ThresholdMapper {
         if (domain == null) return null;
 
         return ThresholdEntity.builder()
+                .id(domain.getId())
                 .temperatureMin(domain.getTemperatureMin())
                 .temperatureMax(domain.getTemperatureMax())
                 .humidityMin(domain.getHumidityMin())
@@ -29,6 +30,7 @@ public class ThresholdMapper {
     public Threshold toDomain(ThresholdEntity entity) {
         if (entity == null) return null;
         return Threshold.builder()
+                .id(entity.getId())
                 .temperatureMin(entity.getTemperatureMin())
                 .temperatureMax(entity.getTemperatureMax())
                 .humidityMin(entity.getHumidityMin())
