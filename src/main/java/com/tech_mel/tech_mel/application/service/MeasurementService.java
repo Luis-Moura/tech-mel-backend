@@ -5,6 +5,7 @@ import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.DailyMeasurementAverage;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.Measurement;
+import com.tech_mel.tech_mel.domain.port.input.AlertUseCase;
 import com.tech_mel.tech_mel.domain.port.input.MeasurementUseCase;
 import com.tech_mel.tech_mel.domain.port.output.DailyMeasurementAverageRepositoryPort;
 import com.tech_mel.tech_mel.domain.port.output.HiveRepositoryPort;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class MeasurementService implements MeasurementUseCase {
     private final HiveRepositoryPort hiveRepositoryPort;
     private final DailyMeasurementAverageRepositoryPort dailyMeasurementAverageRepositoryPort;
+    private final AlertUseCase alertUseCase;
     private final RedisIotPort redisIotPort;
 
     @Override
@@ -51,8 +53,7 @@ public class MeasurementService implements MeasurementUseCase {
 
         redisIotPort.saveMeasurement(apiKey, measurement);
 
-        // disparar alerta para caso medição esteja fora dos limites,
-        // necessário implementar lógica de alerta com serviço e portas e etc.
+        alertUseCase.saveAlert(measurement, hive, request.measuredAt());
 
         return measurement;
     }
