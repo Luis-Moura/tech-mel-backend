@@ -6,6 +6,7 @@ import com.tech_mel.tech_mel.infrastructure.api.dto.request.threshold.CreateThre
 import com.tech_mel.tech_mel.infrastructure.api.dto.response.threshold.ThresholdResponse;
 import com.tech_mel.tech_mel.infrastructure.security.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -110,7 +112,10 @@ public class ThresholdController {
                     )
             )
     })
-    public ResponseEntity<ThresholdResponse> createThreshold(CreateThresholdRequest request) {
+    public ResponseEntity<ThresholdResponse> createThreshold(
+            @Parameter(description = "Dados do limiar a serem criados", required = true)
+            @RequestBody @Valid CreateThresholdRequest request
+    ) {
         UUID ownerId = authenticationUtil.getCurrentUserId();
 
         Threshold threshold = thresholdUseCase.createThreshold(request, ownerId);
@@ -123,6 +128,7 @@ public class ThresholdController {
                 .humidityMax(threshold.getHumidityMax())
                 .co2Min(threshold.getCo2Min())
                 .co2Max(threshold.getCo2Max())
+                .hiveId(threshold.getHive().getId())
                 .build();
 
         return ResponseEntity.ok(response);
@@ -207,7 +213,10 @@ public class ThresholdController {
                     )
             )
     })
-    public ResponseEntity<ThresholdResponse> getThresholdById(@PathVariable UUID thresholdId) {
+    public ResponseEntity<ThresholdResponse> getThresholdById(
+            @Parameter(description = "ID do limiar", required = true)
+            @PathVariable UUID thresholdId
+    ) {
         UUID ownerId = authenticationUtil.getCurrentUserId();
 
         Threshold threshold = thresholdUseCase.getThresholdById(thresholdId, ownerId);
@@ -220,6 +229,107 @@ public class ThresholdController {
                 .humidityMax(threshold.getHumidityMax())
                 .co2Min(threshold.getCo2Min())
                 .co2Max(threshold.getCo2Max())
+                .hiveId(threshold.getHive().getId())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/hive/{hiveId}")
+    @Operation(
+            summary = "Buscar limiar por ID da colmeia",
+            description = "Retorna os dados do limiar de sensores associado a uma colmeia específica pelo seu ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Limiar encontrado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ThresholdResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+                                                "temperatureMin": 10.0,
+                                                "temperatureMax": 40.0,
+                                                "humidityMin": 30.0,
+                                                "humidityMax": 80.0,
+                                                "co2Min": 350.0,
+                                                "co2Max": 1200.0
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token de acesso inválido ou expirado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "timestamp": "2024-01-01T10:00:00",
+                                                "status": 401,
+                                                "error": "Unauthorized",
+                                                "message": "Token inválido ou expirado"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Usuário não tem permissão para acessar este limiar",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "timestamp": "2024-01-01T10:00:00",
+                                                "status": 403,
+                                                "error": "Forbidden",
+                                                "message": "Você não tem permissão para acessar este limiar."
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Limiar não encontrado para a colmeia especificada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "timestamp": "2024-01-01T10:00:00",
+                                                "status": 404,
+                                                "error": "Not Found",
+                                                "message": "Limiar não encontrado para a colmeia especificada"
+                                            }"""
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<ThresholdResponse> getThresholdByHiveId(
+            @Parameter(description = "ID da colmeia", required = true)
+            @PathVariable UUID hiveId
+    ) {
+        UUID ownerId = authenticationUtil.getCurrentUserId();
+
+        Threshold threshold = thresholdUseCase.getThresholdByHiveId(hiveId, ownerId);
+
+        ThresholdResponse response = ThresholdResponse.builder()
+                .id(threshold.getId())
+                .temperatureMin(threshold.getTemperatureMin())
+                .temperatureMax(threshold.getTemperatureMax())
+                .humidityMin(threshold.getHumidityMin())
+                .humidityMax(threshold.getHumidityMax())
+                .co2Min(threshold.getCo2Min())
+                .co2Max(threshold.getCo2Max())
+                .hiveId(threshold.getHive().getId())
                 .build();
 
         return ResponseEntity.ok(response);
@@ -307,7 +417,9 @@ public class ThresholdController {
             )
     })
     public ResponseEntity<Void> updateThreshold(
+            @Parameter(description = "ID do limiar", required = true)
             @PathVariable UUID thresholdId,
+            @Parameter(description = "Dados do limiar a serem atualizados", required = true)
             @RequestBody CreateThresholdRequest request
     ) {
         UUID ownerId = authenticationUtil.getCurrentUserId();

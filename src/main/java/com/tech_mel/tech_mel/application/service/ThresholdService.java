@@ -1,5 +1,6 @@
 package com.tech_mel.tech_mel.application.service;
 
+import com.tech_mel.tech_mel.application.exception.BadRequestException;
 import com.tech_mel.tech_mel.application.exception.NotFoundException;
 import com.tech_mel.tech_mel.domain.model.Hive;
 import com.tech_mel.tech_mel.domain.model.Threshold;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,6 +33,14 @@ public class ThresholdService implements ThresholdUseCase {
         if (!hive.getOwner().getId().equals(ownerId)) {
             log.error("Hive ID {} does not belong to owner ID {}", request.hiveId(), ownerId);
             throw new NotFoundException("Hive does not belong to the specified owner.");
+        }
+
+        Optional<Threshold> existingThreshold = thresholdRepositoryPort
+                .findByHiveId(request.hiveId());
+
+        if (existingThreshold.isPresent()) {
+            log.error("Threshold already exists for Hive ID: {}", request.hiveId());
+            throw new BadRequestException("Threshold already exists for this hive.");
         }
 
         Threshold threshold = Threshold.builder()
@@ -60,6 +70,26 @@ public class ThresholdService implements ThresholdUseCase {
         }
 
         return threshold;
+    }
+
+    @Override
+    public Threshold getThresholdByHiveId(UUID hiveId, UUID ownerId) {
+        Hive hive = hiveRepositoryPort.findById(hiveId)
+                .orElseThrow(() -> {
+                    log.error("Hive not found for ID: {}", hiveId);
+                    return new NotFoundException("Hive not found for ID: " + hiveId);
+                });
+
+        if (!hive.getOwner().getId().equals(ownerId)) {
+            log.error("Hive ID {} does not belong to owner ID {}", hiveId, ownerId);
+            throw new NotFoundException("Hive does not belong to the specified owner.");
+        }
+
+        return thresholdRepositoryPort.findByHiveId(hiveId)
+                .orElseThrow(() -> {
+                    log.error("Threshold not found for Hive ID: {}", hiveId);
+                    return new NotFoundException("Threshold not found for Hive ID: " + hiveId);
+                });
     }
 
     @Override

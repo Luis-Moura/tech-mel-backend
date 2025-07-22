@@ -10,5 +10,7 @@ public interface ThresholdUseCase {
 
     Threshold getThresholdById(UUID thresholdId, UUID ownerId);
 
+    Threshold getThresholdByHiveId(UUID hiveId, UUID ownerId);
+
     void updateThreshold(UUID thresholdId, CreateThresholdRequest request, UUID ownerId);
 }
