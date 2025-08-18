@@ -56,6 +56,7 @@ public class UserEntity {
     private String providerId;
 
     @Column(name = "available_hives")
+    @Builder.Default
     private int availableHives = 0;
 
     @CreationTimestamp
