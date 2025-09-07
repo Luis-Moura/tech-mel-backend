@@ -8,4 +8,10 @@ public interface EmailSenderPort {
     void sendUserDeletionEmail(String to, String name);
 
     void sendPasswordResetEmail(String to, String name, UUID verificationToken);
+
+    void sendTechnicianCredentialsEmail(String to, String name, String temporaryPassword);
+
+    void sendAdminCredentialsEmail(String to, String name, String temporaryPassword);
+
+    void sendPasswordResetNotificationEmail(String to, String name, String temporaryPassword);
 }
