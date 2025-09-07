@@ -24,8 +24,6 @@ public interface AuditLogJpaRepository extends JpaRepository<AuditLogEntity, UUI
 
     Page<AuditLogEntity> findByEntityType(EntityType entityType, Pageable pageable);
 
-    Page<AuditLogEntity> findByEntityId(String entityId, Pageable pageable);
-
     Page<AuditLogEntity> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
     @Query("SELECT a FROM AuditLogEntity a WHERE " +
