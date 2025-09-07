@@ -64,7 +64,7 @@ public class AuthService implements AuthUseCase {
                 throw new UnauthorizedException("E-mail não verificado. Por favor, verifique seu e-mail antes de fazer login.");
             }
 
-            if (!user.isEnabled() || user.isLocked()) {
+            if (!user.isEnabled() || user.isLocked() || !user.isActive()) {
                 log.warn("Tentativa de login em conta bloqueada/desativada: {}", email);
                 throw new UnauthorizedException("Conta bloqueada ou desativada. Entre em contato com o suporte.");
             }
@@ -101,6 +101,7 @@ public class AuthService implements AuthUseCase {
                 existingUser.setPassword(passwordEncoder.encode(password));
                 existingUser.setAuthProvider(User.AuthProvider.LOCAL);
                 existingUser.setName(name);
+                existingUser.setActive(true);
                 existingUser.setEnabled(true);
                 existingUser.setLocked(false);
 
@@ -118,6 +119,7 @@ public class AuthService implements AuthUseCase {
                 .name(name)
                 .emailVerified(false)
                 .role(User.Role.COMMON)
+                .isActive(true)
                 .enabled(true)
                 .locked(false)
                 .build();
