@@ -28,8 +28,6 @@ public interface AuditLogJpaRepository extends JpaRepository<AuditLogEntity, UUI
 
     Page<AuditLogEntity> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
-    Page<AuditLogEntity> findByUserIdAndTimestampBetween(UUID userId, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
-
     @Query("SELECT a FROM AuditLogEntity a WHERE " +
            "(:userId IS NULL OR a.userId = :userId) AND " +
            "(:action IS NULL OR a.action = :action) AND " +

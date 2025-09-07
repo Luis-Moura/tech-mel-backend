@@ -20,8 +20,6 @@ public interface AuditRepositoryPort {
     
     Page<AuditLog> findByEntityType(String entityType, Pageable pageable);
     
-    Page<AuditLog> findByEntityId(String entityId, Pageable pageable);
-    
     Page<AuditLog> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
     
     Page<AuditLog> findByFilters(

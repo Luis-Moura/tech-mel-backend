@@ -63,13 +63,6 @@ public class AuditRepositoryAdapter implements AuditRepositoryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AuditLog> findByEntityId(String entityId, Pageable pageable) {
-        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByEntityId(entityId, pageable);
-        return entityPage.map(auditLogMapper::toDomain);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Page<AuditLog> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
         Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByTimestampBetween(startTime, endTime, pageable);
         return entityPage.map(auditLogMapper::toDomain);

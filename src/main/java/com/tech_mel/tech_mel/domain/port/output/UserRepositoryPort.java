@@ -36,15 +36,11 @@ public interface UserRepositoryPort {
     
     List<User> findByLastLoginBefore(LocalDateTime date);
     
-    List<User> findByIsActiveAndRole(boolean isActive, User.Role role);
-    
     long countByRole(User.Role role);
     
     long countByIsActive(boolean isActive);
     
     long countByCreatedAtAfter(LocalDateTime date);
-    
-    long countByLastLoginBefore(LocalDateTime date);
     
     boolean existsByEmail(String email);
     

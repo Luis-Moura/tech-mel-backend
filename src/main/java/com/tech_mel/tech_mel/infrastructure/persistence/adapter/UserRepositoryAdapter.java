@@ -126,16 +126,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> findByIsActiveAndRole(boolean isActive, User.Role role) {
-        UserEntity.Role entityRole = mapRoleToEntity(role);
-        return userJpaRepository.findByIsActiveAndRole(isActive, entityRole)
-                .stream()
-                .map(userMapper::toDomain)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public long countByRole(User.Role role) {
         UserEntity.Role entityRole = mapRoleToEntity(role);
         return userJpaRepository.countByRole(entityRole);
@@ -151,12 +141,6 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Transactional(readOnly = true)
     public long countByCreatedAtAfter(LocalDateTime date) {
         return userJpaRepository.countByCreatedAtAfter(date);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public long countByLastLoginBefore(LocalDateTime date) {
-        return userJpaRepository.countByLastLoginBefore(date);
     }
 
     @Override

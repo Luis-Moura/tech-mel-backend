@@ -48,10 +48,4 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, UUID> {
     boolean existsByEmail(String email);
     
     boolean existsByEmailAndIdNot(String email, UUID id);
-    
-    @Query("SELECT u FROM UserEntity u WHERE u.lastLogin < :cutoffDate OR u.lastLogin IS NULL")
-    List<UserEntity> findInactiveUsers(@Param("cutoffDate") LocalDateTime cutoffDate);
-    
-    @Query("SELECT u FROM UserEntity u WHERE u.createdAt >= :startDate ORDER BY u.createdAt DESC")
-    List<UserEntity> findRecentlyRegistered(@Param("startDate") LocalDateTime startDate, Pageable pageable);
 }
