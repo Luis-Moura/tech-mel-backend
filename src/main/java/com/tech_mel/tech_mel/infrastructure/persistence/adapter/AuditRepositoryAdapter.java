@@ -1,6 +1,8 @@
 package com.tech_mel.tech_mel.infrastructure.persistence.adapter;
 
+import com.tech_mel.tech_mel.domain.model.AuditAction;
 import com.tech_mel.tech_mel.domain.model.AuditLog;
+import com.tech_mel.tech_mel.domain.model.EntityType;
 import com.tech_mel.tech_mel.domain.port.output.AuditRepositoryPort;
 import com.tech_mel.tech_mel.infrastructure.persistence.entity.AuditLogEntity;
 import com.tech_mel.tech_mel.infrastructure.persistence.mapper.AuditLogMapper;
@@ -48,14 +50,14 @@ public class AuditRepositoryAdapter implements AuditRepositoryPort {
     @Override
     @Transactional(readOnly = true)
     public Page<AuditLog> findByAction(String action, Pageable pageable) {
-        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByAction(action, pageable);
+        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByAction(AuditAction.valueOf(action), pageable);
         return entityPage.map(auditLogMapper::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<AuditLog> findByEntityType(String entityType, Pageable pageable) {
-        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByEntityType(entityType, pageable);
+        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByEntityType(EntityType.valueOf(entityType), pageable);
         return entityPage.map(auditLogMapper::toDomain);
     }
 
@@ -70,13 +72,6 @@ public class AuditRepositoryAdapter implements AuditRepositoryPort {
     @Transactional(readOnly = true)
     public Page<AuditLog> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
         Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByTimestampBetween(startTime, endTime, pageable);
-        return entityPage.map(auditLogMapper::toDomain);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<AuditLog> findByUserIdAndTimestampBetween(UUID userId, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
-        Page<AuditLogEntity> entityPage = auditLogJpaRepository.findByUserIdAndTimestampBetween(userId, startTime, endTime, pageable);
         return entityPage.map(auditLogMapper::toDomain);
     }
 
@@ -104,13 +99,13 @@ public class AuditRepositoryAdapter implements AuditRepositoryPort {
     @Override
     @Transactional(readOnly = true)
     public long countByAction(String action) {
-        return auditLogJpaRepository.countByAction(action);
+        return auditLogJpaRepository.countByAction(AuditAction.valueOf(action));
     }
 
     @Override
     @Transactional(readOnly = true)
     public long countByEntityType(String entityType) {
-        return auditLogJpaRepository.countByEntityType(entityType);
+        return auditLogJpaRepository.countByEntityType(EntityType.valueOf(entityType));
     }
 
     @Override

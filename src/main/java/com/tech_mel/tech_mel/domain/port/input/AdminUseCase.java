@@ -60,6 +60,4 @@ public interface AdminUseCase {
     boolean isPrimaryAdmin(UUID userId);
     
     boolean canManageAdmins(UUID currentUserId);
-    
-    boolean canManageUser(UUID currentUserId, UUID targetUserId);
 }

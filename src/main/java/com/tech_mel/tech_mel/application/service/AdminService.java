@@ -489,29 +489,7 @@ public class AdminService implements AdminUseCase {
         return isPrimaryAdmin(currentUserId);
     }
 
-    @Override
-    public boolean canManageUser(UUID currentUserId, UUID targetUserId) {
-        User currentUser = userRepositoryPort.findById(currentUserId)
-                .orElseThrow(() -> new NotFoundException("Usuário atual não encontrado"));
-        
-        if (currentUser.getRole() != User.Role.ADMIN) {
-            return false;
-        }
-        
-        // Admin primário pode gerenciar qualquer usuário
-        if (currentUser.isPrimary()) {
-            return true;
-        }
-        
-        // Admin secundário não pode gerenciar outros admins
-        User targetUser = userRepositoryPort.findById(targetUserId)
-                .orElseThrow(() -> new NotFoundException("Usuário alvo não encontrado"));
-        
-        return targetUser.getRole() != User.Role.ADMIN;
-    }
-
     // Métodos auxiliares privados
-    
     private String generateTemporaryPassword() {
         SecureRandom random = new SecureRandom();
         StringBuilder password = new StringBuilder();

@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public interface AuditUseCase {
 
     // Operações básicas de auditoria
-    CompletableFuture<CompletableFuture<CompletableFuture<AuditLog>>> logAction(
+    void logAction(
             UUID userId,
             AuditAction action,
             EntityType entityType,
@@ -45,17 +45,6 @@ public interface AuditUseCase {
             String userAgent
     );
 
-    CompletableFuture<AuditLog> logFailedAction(
-            UUID userId,
-            AuditAction action,
-            EntityType entityType,
-            String entityId,
-            String details,
-            String errorMessage,
-            String ipAddress,
-            String userAgent
-    );
-
     // Consultas de auditoria
     Page<AuditLog> getAllAuditLogs(Pageable pageable);
 
@@ -64,8 +53,6 @@ public interface AuditUseCase {
     Page<AuditLog> getAuditLogsByAction(AuditAction action, Pageable pageable);
 
     Page<AuditLog> getAuditLogsByEntityType(EntityType entityType, Pageable pageable);
-
-    Page<AuditLog> getAuditLogsByEntity(EntityType entityType, String entityId, Pageable pageable);
 
     Page<AuditLog> getAuditLogsByDateRange(
             LocalDateTime startDate,

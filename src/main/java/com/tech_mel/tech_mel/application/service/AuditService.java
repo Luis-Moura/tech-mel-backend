@@ -31,7 +31,7 @@ public class AuditService implements AuditUseCase {
 
     @Override
     @Async
-    public CompletableFuture<CompletableFuture<CompletableFuture<AuditLog>>> logAction(
+    public void logAction(
             UUID userId,
             AuditAction action,
             EntityType entityType,
@@ -39,7 +39,7 @@ public class AuditService implements AuditUseCase {
             String details
     )
     {
-        return CompletableFuture.completedFuture(logAction(userId, action, entityType, entityId, details, null, null));
+        CompletableFuture.completedFuture(logAction(userId, action, entityType, entityId, details, null, null));
     }
 
     @Override
@@ -95,43 +95,6 @@ public class AuditService implements AuditUseCase {
     }
 
     @Override
-    @Async
-    public CompletableFuture<AuditLog> logFailedAction(
-            UUID userId,
-            AuditAction action,
-            EntityType entityType,
-            String entityId,
-            String details,
-            String errorMessage,
-            String ipAddress,
-            String userAgent
-    ) {
-        try {
-            User user = userRepositoryPort.findById(userId).orElse(null);
-
-            AuditLog auditLog = AuditLog.builder()
-                    .userId(userId)
-                    .userName(user != null ? user.getName() : "Unknown")
-                    .userEmail(user != null ? user.getEmail() : "Unknown")
-                    .action(action)
-                    .entityType(entityType)
-                    .entityId(entityId)
-                    .details(details)
-                    .ipAddress(ipAddress)
-                    .userAgent(userAgent)
-                    .timestamp(LocalDateTime.now())
-                    .success(false)
-                    .errorMessage(errorMessage)
-                    .build();
-
-            return CompletableFuture.completedFuture(auditRepositoryPort.save(auditLog));
-        } catch (Exception e) {
-            log.error("Erro ao salvar log de auditoria falho: {}", e.getMessage(), e);
-            return CompletableFuture.completedFuture(null);
-        }
-    }
-
-    @Override
     public Page<AuditLog> getAllAuditLogs(Pageable pageable) {
         return auditRepositoryPort.findAll(pageable);
     }
@@ -149,11 +112,6 @@ public class AuditService implements AuditUseCase {
     @Override
     public Page<AuditLog> getAuditLogsByEntityType(EntityType entityType, Pageable pageable) {
         return auditRepositoryPort.findByEntityType(entityType.name(), pageable);
-    }
-
-    @Override
-    public Page<AuditLog> getAuditLogsByEntity(EntityType entityType, String entityId, Pageable pageable) {
-        return auditRepositoryPort.findByEntityId(entityId, pageable);
     }
 
     @Override

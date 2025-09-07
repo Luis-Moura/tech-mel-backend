@@ -24,8 +24,6 @@ public interface AuditRepositoryPort {
     
     Page<AuditLog> findByTimestampBetween(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
     
-    Page<AuditLog> findByUserIdAndTimestampBetween(UUID userId, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
-    
     Page<AuditLog> findByFilters(
             UUID userId,
             String action,
