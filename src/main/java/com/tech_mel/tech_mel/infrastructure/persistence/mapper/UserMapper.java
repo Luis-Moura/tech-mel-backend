@@ -27,6 +27,11 @@ public class UserMapper {
                 .authProvider(mapAuthProviderToDomain(entity.getAuthProvider()))
                 .providerId(entity.getProviderId())
                 .availableHives(entity.getAvailableHives())
+                .isPrimary(entity.isPrimary())
+                .isActive(entity.isActive())
+                .requiresPasswordChange(entity.isRequiresPasswordChange())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
@@ -50,6 +55,11 @@ public class UserMapper {
                 .authProvider(mapAuthProviderToEntity(domain.getAuthProvider()))
                 .providerId(domain.getProviderId())
                 .availableHives(domain.getAvailableHives())
+                .isPrimary(domain.isPrimary())
+                .isActive(domain.isActive())
+                .requiresPasswordChange(domain.isRequiresPasswordChange())
+                .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
                 .build();
     }
 

@@ -111,6 +111,7 @@ public class UserController {
                 .emailVerified(currentUser.isEmailVerified())
                 .createdAt(currentUser.getCreatedAt())
                 .lastLogin(currentUser.getLastLogin())
+                .requiresPasswordChange(currentUser.isRequiresPasswordChange())
                 .build();
 
         return ResponseEntity.ok(userResponse);

@@ -37,6 +37,12 @@ public class User {
     private String providerId;
 
     private int availableHives;
+    
+    private boolean isPrimary;
+    
+    private boolean isActive;
+    
+    private boolean requiresPasswordChange;
 
     private LocalDateTime createdAt;
 

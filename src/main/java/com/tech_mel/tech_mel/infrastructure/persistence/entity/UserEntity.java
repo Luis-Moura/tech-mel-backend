@@ -58,6 +58,18 @@ public class UserEntity {
     @Column(name = "available_hives")
     @Builder.Default
     private int availableHives = 0;
+    
+    @Column(name = "is_primary", nullable = false)
+    @Builder.Default
+    private boolean isPrimary = false;
+    
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private boolean isActive = true;
+    
+    @Column(name = "requires_password_change", nullable = false)
+    @Builder.Default
+    private boolean requiresPasswordChange = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

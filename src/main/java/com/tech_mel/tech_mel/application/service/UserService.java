@@ -1,6 +1,7 @@
 package com.tech_mel.tech_mel.application.service;
 
 import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.tech_mel.tech_mel.application.exception.ConflictException;
@@ -71,6 +72,10 @@ public class UserService implements UserUseCase {
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             log.warn("Senha atual incorreta na tentativa de alteração para: {}", email);
             throw new ConflictException("Senha atual incorreta");
+        }
+
+        if (user.isRequiresPasswordChange()) {
+            user.setRequiresPasswordChange(false);
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));

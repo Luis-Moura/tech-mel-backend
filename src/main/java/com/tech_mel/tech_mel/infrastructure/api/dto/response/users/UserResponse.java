@@ -25,6 +25,9 @@ public class UserResponse {
     
     @Schema(description = "Se o email foi verificado", example = "true")
     private boolean emailVerified;
+
+    @Schema(description = "Se a conta precisa trocar a senha", example = "false")
+    private boolean requiresPasswordChange;
     
     @Schema(description = "Data de criação da conta", example = "2024-01-01T10:00:00")
     private LocalDateTime createdAt;
