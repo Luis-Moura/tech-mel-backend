@@ -140,16 +140,16 @@ public class User {
 ### Estados e Lifecycle
 
 ```
-┌─────────────┐    CREATE     ┌─────────────┐    ACTIVATE   ┌─────────────┐
+┌─────────────┐    CREATE       ┌─────────────┐    ACTIVATE     ┌─────────────┐
 │   PENDING   │ ──────────────► │  INACTIVE   │ ──────────────► │   ACTIVE    │
-│   (Virtual) │               │ (Physical)  │               │ (Operational)│
-└─────────────┘               └─────────────┘               └─────────────┘
+│   (Virtual) │                 │ (Physical)  │                 │(Operational)│
+└─────────────┘                 └─────────────┘                 └─────────────┘
                                       │                             │
                                   DELETE │                    DEACTIVATE │
                                       ▼                             ▼
                               ┌─────────────┐                ┌─────────────┐
                               │   DELETED   │                │  INACTIVE   │
-                              │ (+1 avail.) │                │ (Maintenance)│
+                              │ (+1 avail.) │                │(Maintenance)│
                               └─────────────┘                └─────────────┘
 ```
 
