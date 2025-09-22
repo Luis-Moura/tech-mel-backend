@@ -228,6 +228,19 @@ docker-compose ps
 3. **PostgreSQL** instalado e rodando
 4. **Redis** instalado e rodando
 
+### exporte as variáveis de ambiente no terminal
+### exemplo:
+````bash
+export MAIL_HOST=smtp.gmail.com
+export MAIL_PORT=587
+export MAIL_USERNAME=luistestes34@gmail.com
+export MAIL_PASSWORD='rtgo xsyi nswy juik'
+export MAIL_FROM=email...
+export MAIL_AUTH=true
+export MAIL_STARTTLS=true
+...
+````
+
 ### Configuração do Banco Local
 
 ```bash
