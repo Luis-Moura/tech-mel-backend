@@ -58,9 +58,19 @@ public class RedisIotAdapter implements RedisIotPort {
 
     @Override
     public Map<String, Measurement> getLatestMeasurementsForMultipleHives(List<String> apiKeys) {
+        // Evita NPE ao lidar com lista nula ou vazia
+        if (apiKeys == null || apiKeys.isEmpty()) {
+            return Map.of();
+        }
+
+        // Filtra apiKeys nulas antes e só cria o entry quando a measurement não é nula
         return apiKeys.stream()
-                .map(apiKey -> Map.entry(apiKey, getLatestMeasurement(apiKey)))
-                .filter(entry -> entry.getValue() != null)
+                .filter(Objects::nonNull)
+                .map(apiKey -> {
+                    Measurement latest = getLatestMeasurement(apiKey);
+                    return latest == null ? null : Map.entry(apiKey, latest);
+                })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

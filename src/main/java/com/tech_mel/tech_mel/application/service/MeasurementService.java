@@ -106,7 +106,7 @@ public class MeasurementService implements MeasurementUseCase {
         Hive hive = hiveRepositoryPort.findById(hived)
                 .orElseThrow(() -> new NotFoundException("Hive not found"));
 
-        if (hive.getOwner().getId() != userId) {
+        if (!hive.getOwner().getId().equals(userId)) {
             log.warn("User {} does not own hive: {}", userId, hive.getId());
             throw new NotFoundException("Hive not found for the given user.");
         }
