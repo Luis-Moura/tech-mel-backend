@@ -75,6 +75,15 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             }
         }
 
+        // Validar se a conta está ativa
+        if (!user.isActive()) {
+            String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+                    .queryParam("error", "Sua conta foi desativada. Entre em contato com o suporte.")
+                    .build().toUriString();
+            getRedirectStrategy().sendRedirect(request, response, targetUrl);
+            return;
+        }
+
         if (user.getRole() != User.Role.COMMON) {
             String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                     .queryParam("error", "Apenas usuários comuns podem usar o login com Google.")
