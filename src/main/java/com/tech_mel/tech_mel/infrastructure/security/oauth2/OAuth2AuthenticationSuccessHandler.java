@@ -76,7 +76,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         // Validar se a conta está ativa
-        if (!user.isActive()) {
+        if (user.isLocked()) {
             String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
                     .queryParam("error", "Sua conta foi desativada. Entre em contato com o suporte.")
                     .build().toUriString();
