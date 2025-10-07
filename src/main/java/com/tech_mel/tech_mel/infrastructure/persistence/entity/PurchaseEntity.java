@@ -37,6 +37,9 @@ public class PurchaseEntity {
     @Column(name = "external_reference", nullable = false, unique = true)
     private String externalReference;
 
+    @Column(name = "buyer_address", nullable = false)
+    private String buyerAddress;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PurchaseStatus status;

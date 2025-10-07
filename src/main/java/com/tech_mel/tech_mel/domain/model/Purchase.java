@@ -21,9 +21,11 @@ public class Purchase {
 
     private String externalReference;
 
-    private User buyer;
+    private String buyerAddress;
 
     private PurchaseStatus status;
+
+    private User buyer;
 
     private LocalDateTime createdAt;
 
