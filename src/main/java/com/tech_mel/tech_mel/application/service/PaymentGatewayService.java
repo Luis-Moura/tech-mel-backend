@@ -93,7 +93,7 @@ public class PaymentGatewayService implements PaymentGatewayPort {
 
         PreferenceClient client = new PreferenceClient();
 
-        Preference preference = null;
+        Preference preference;
 
         try {
             preference = client.create(preferenceRequest);
