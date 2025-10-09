@@ -287,7 +287,7 @@ public class AuthController {
             )
         )
     })
-    public ResponseEntity<?> resendVerificationEmail(@Valid @RequestParam ResendEmailVerificationRequest request) {
+    public ResponseEntity<?> resendVerificationEmail(@Valid @RequestBody ResendEmailVerificationRequest request) {
         authUseCase.resendVerificationEmail(request.email());
         return ResponseEntity.ok().body(Map.of("message", "E-mail de verificação reenviado com sucesso."));
     }
