@@ -36,8 +36,6 @@ public class PaymentGatewayService implements PaymentGatewayPort {
     @Value("${app.url.frontend}")
     private String frontendUrl;
 
-
-
     @Value("${app.url}")
     private String baseUrl;
 
@@ -99,13 +97,11 @@ public class PaymentGatewayService implements PaymentGatewayPort {
             preference = client.create(preferenceRequest);
         } catch (MPException e) {
             log.error("Erro genérico do MercadoPago: {}", e.getMessage(), e);
-            log.info("XXXXXXXXXXXXXXXXXXXXXXXfrontendUrl: {}", frontendUrl);
             throw new RuntimeException("Erro ao criar intenção de pagamento", e);
         } catch (MPApiException e) {
             log.error("Erro da API do MercadoPago: {}", e.getMessage());
             log.error("Status code: {}", e.getApiResponse().getStatusCode());
             log.error("Response content: {}", e.getApiResponse().getContent());
-            log.info("XXXXXXXXXXXXXXXXXXXXXXXXXXXfrontendUrl: {}", frontendUrl);
             throw new RuntimeException("Erro ao criar intenção de pagamento", e);
         }
 
