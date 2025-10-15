@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/measurements/iot").permitAll()
                         .requestMatchers("/api/technician/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TECHNICIAN")
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/webhook/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
