@@ -82,11 +82,11 @@ public class PaymentGatewayService implements PaymentGatewayPort {
 //                                .build()
 //                )
 //                .autoReturn("approved")
-                .payer(
-                        PreferencePayerRequest.builder()
-                                .name(user.getName())
-                                .email(user.getEmail()).build()
-                )
+//                .payer(
+//                        PreferencePayerRequest.builder()
+//                                .name(user.getName())
+//                                .email(user.getEmail()).build()
+//                )
                 .notificationUrl(baseUrl + "/api/payments/notifications")
                 .externalReference(externalReference)
                 .build();
