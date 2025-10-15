@@ -87,7 +87,7 @@ public class PaymentGatewayService implements PaymentGatewayPort {
 //                                .name(user.getName())
 //                                .email(user.getEmail()).build()
 //                )
-                .notificationUrl(baseUrl + "/api/payments/notifications")
+                .notificationUrl(baseUrl + "/api/purchases/notifications")
                 .externalReference(externalReference)
                 .build();
 
