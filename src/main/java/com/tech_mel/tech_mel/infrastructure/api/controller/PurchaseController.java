@@ -50,20 +50,20 @@ public class PurchaseController {
 
     @PostMapping("/webhook")
     public ResponseEntity<Void> handlePaymentWebhook(
-            @RequestBody Map<String, Object> payload,
-            @RequestHeader(value = "x-signature", required = false) String signatureHeader
+            @RequestBody Map<String, Object> payload
+//            @RequestHeader(value = "x-signature", required = false) String signatureHeader
     ) {
         try {
-            if (signatureHeader == null) {
-                return ResponseEntity.status(403).build();
-            }
+//            if (signatureHeader == null) {
+//                return ResponseEntity.status(403).build();
+//            }
 
             Long paymentId = Long.parseLong(payload.get("id").toString());
             String type = payload.get("type").toString();
 
-            if (!isSignatureValid(paymentId, type, signatureHeader)) {
-                return ResponseEntity.status(403).build();
-            }
+//            if (!isSignatureValid(paymentId, type, signatureHeader)) {
+//                return ResponseEntity.status(403).build();
+//            }
 
             if (!"payment".equalsIgnoreCase(type)) {
                 return ResponseEntity.ok().build(); // ignora outros tipos
