@@ -74,14 +74,14 @@ public class PaymentGatewayService implements PaymentGatewayPort {
 
         PreferenceRequest preferenceRequest = PreferenceRequest.builder()
                 .items(items)
-                .backUrls(
-                        PreferenceBackUrlsRequest.builder()
-                                .success(frontendUrl + "/payment/success")
-                                .failure(frontendUrl + "/payment/failure")
-                                .pending(frontendUrl + "/payment/pending")
-                                .build()
-                )
-                .autoReturn("approved")
+//                .backUrls(
+//                        PreferenceBackUrlsRequest.builder()
+//                                .success(frontendUrl + "/payment/success")
+//                                .failure(frontendUrl + "/payment/failure")
+//                                .pending(frontendUrl + "/payment/pending")
+//                                .build()
+//                )
+//                .autoReturn("approved")
                 .payer(
                         PreferencePayerRequest.builder()
                                 .name(user.getName())
