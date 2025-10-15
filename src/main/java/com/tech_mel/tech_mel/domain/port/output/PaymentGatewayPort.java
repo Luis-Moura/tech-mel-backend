@@ -5,4 +5,6 @@ import java.util.UUID;
 
 public interface PaymentGatewayPort {
     Map<String, String> createPaymentIntention(int quantity, UUID userId, String buyerAdress);
+
+    void processPaymentNotification(Long paymentId);
 }
