@@ -1,15 +1,18 @@
 package com.tech_mel.tech_mel.application.service;
 
 import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.preference.*;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.preference.Preference;
+import com.tech_mel.tech_mel.application.exception.BadRequestException;
 import com.tech_mel.tech_mel.domain.model.Purchase;
 import com.tech_mel.tech_mel.domain.model.PurchaseStatus;
 import com.tech_mel.tech_mel.domain.model.User;
 import com.tech_mel.tech_mel.domain.port.output.PaymentGatewayPort;
 import com.tech_mel.tech_mel.domain.port.output.PurchaseRepositoryPort;
+import com.tech_mel.tech_mel.domain.port.output.UserRepositoryPort;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +29,8 @@ public class PaymentGatewayService implements PaymentGatewayPort {
     private final UserService userService;
 
     private final PurchaseRepositoryPort purchaseRepositoryPort;
+
+    private final UserRepositoryPort userRepositoryPort;
 
     @Value("${mercadopago.access.token}")
     private String accessToken;
@@ -122,5 +124,51 @@ public class PaymentGatewayService implements PaymentGatewayPort {
                 "initPoint", preference.getInitPoint(),
                 "externalReference", externalReference
         );
+    }
+
+    @Override
+    public void processPaymentNotification(Long paymentId) {
+
+        try {
+            var paymentClient = new PaymentClient();
+
+            var payment = paymentClient.get(paymentId);
+
+            String status = payment.getStatus();
+            String externalReference = payment.getExternalReference();
+
+            log.info("📦 Notificação recebida - PaymentID={} | Status={} | Reference={}", paymentId, status, externalReference);
+
+            Purchase purchase = purchaseRepositoryPort.findByExternalReference(externalReference)
+                    .orElseThrow(() -> new BadRequestException("Compra não encontrada para a referência: " + externalReference));
+
+            switch (status) {
+                case "approved" -> purchase.setStatus(PurchaseStatus.PAID);
+                case "rejected" -> purchase.setStatus(PurchaseStatus.FAILED);
+                default -> purchase.setStatus(PurchaseStatus.PENDING);
+            }
+
+            purchaseRepositoryPort.save(purchase);
+
+            log.info("✅ Pedido atualizado com sucesso: {} -> {}", externalReference, purchase.getStatus());
+
+            if (purchase.getStatus() == PurchaseStatus.PAID) {
+                User buyer = purchase.getBuyer();
+
+                int incrementsBuyerAvailableHives = buyer.getAvailableHives() + purchase.getQuantity();
+
+                buyer.setAvailableHives(incrementsBuyerAvailableHives);
+
+                userRepositoryPort.save(buyer);
+            }
+
+        } catch (MPApiException e) {
+            log.error("Erro na API do Mercado Pago: {}", e.getMessage());
+            log.error("Detalhes: {}", e.getApiResponse().getContent());
+        } catch (MPException e) {
+            log.error("Erro geral do SDK Mercado Pago: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Erro inesperado ao processar notificação: {}", e.getMessage(), e);
+        }
     }
 }
