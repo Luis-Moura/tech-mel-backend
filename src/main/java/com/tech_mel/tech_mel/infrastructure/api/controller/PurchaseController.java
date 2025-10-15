@@ -57,8 +57,11 @@ public class PurchaseController {
 //            if (signatureHeader == null) {
 //                return ResponseEntity.status(403).build();
 //            }
+            System.out.println(payload);
 
-            Long paymentId = Long.parseLong(payload.get("id").toString());
+            Map<String, Object> data = (Map<String, Object>) payload.get("data");
+
+            Long paymentId = Long.parseLong(data.get("id").toString());
             String type = payload.get("type").toString();
 
 //            if (!isSignatureValid(paymentId, type, signatureHeader)) {
