@@ -33,7 +33,6 @@ O projeto segue princípios **SOLID** e **Clean Architecture**, organizado em ca
 ## 💳 Integração de Pagamentos
 
 Sistema de pagamentos integrado com **Mercado Pago** para:
-- Assinaturas e planos premium
 - Processamento seguro de transações
 - Webhooks para atualização automática de status
 
