@@ -1,0 +1,134 @@
+services:
+  # Serviço do backend (Java 17)
+  techmel-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: techmel-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      techmel-postgres:
+        condition: service_healthy
+      techmel-redis:
+        condition: service_healthy
+    environment:
+      # Perfil do Spring
+      SPRING_PROFILE: dev
+
+      # URLs
+      APP_URL: http://localhost:8080
+      APP_URL_FRONTEND: http://localhost:3000
+
+      # Banco de dados (USAR NOME DO SERVIÇO)
+      DB_URL: jdbc:postgresql://techmel-postgres:5432/meubanco
+      DB_NAME: meubanco
+      DB_USERNAME: seu_usuario
+      DB_PASSWORD: sua_senha
+
+      # Redis (USAR NOME DO SERVIÇO)
+      REDIS_HOST: techmel-redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis-senha
+      REDIS_TIMEOUT: 2000
+      REDIS_POOL_MAX_TOTAL: 8
+      REDIS_POOL_MAX_IDLE: 8
+      REDIS_POOL_MIN_IDLE: 0
+
+      # JWT
+      JWT_SECRET: b123e9e19d217169b981a61188920f9d28638709a5132201684d792b9264271b7f09157ed4321b1c097f7a4abecfc0977d40a7ee599c845883bd1074ca23c4af
+      JWT_EXPIRATION: 1800000
+      JWT_REFRESH_EXPIRATION: 432000000
+
+      # OAuth2
+      REDIRECT_URI: http://localhost:8080/login/oauth2/code/google
+      FRONTEND_CALLBACK_URI: http://localhost:3000/auth/callback
+      GOOGLE_CLIENT_ID: 122559513071-fijvfbcght9cnequi1ei3i9n37v2ss0o.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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
+
+      # Email
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_AUTH: true
+      MAIL_STARTTLS: true
+
+      # Admin padrão (será criado automaticamente se não existir)
+      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD}
+
+      # Mercado Pago
+      MP_ACCESS_TOKEN: ${MERCADO_PAGO_TOKEN}
+      MP_WEBHOOK_KEY: ${MERCADO_PAGO_WEBHOOK_KEY}
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Serviço do banco de dados PostgreSQL 15
+  techmel-postgres:
+    image: postgres:15
+    container_name: techmel-postgres
+    environment:
+      POSTGRES_USER: seu_usuario
+      POSTGRES_PASSWORD: sua_senha
+      POSTGRES_DB: meubanco
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seu_usuario -d meubanco"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Serviço do redis
+  techmel-redis:
+    image: redis:7-alpine
+    container_name: techmel-redis
+    command: redis-server --requirepass redis-senha
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis-senha", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Serviço para o pgAdmin (opcional - para acessar: http://localhost:5050)
+  techmel-pgadmin:
+    image: dpage/pgadmin4
+    container_name: techmel-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - techmel-postgres
+    networks:
+      - app-network
+    profiles:
+      - tools
+
+# Volumes para persistência de dados
+volumes:
+  db_data:
+  redis_data:
+
+# Redes para comunicação entre os serviços
+networks:
+  app-network:
+    driver: bridge
